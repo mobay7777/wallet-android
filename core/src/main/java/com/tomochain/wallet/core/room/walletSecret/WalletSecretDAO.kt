@@ -1,7 +1,6 @@
 package com.tomochain.wallet.core.room.walletSecret
 
 import androidx.room.*
-import com.tomochain.wallet.core.room.wallet.EntityWallet
 import io.reactivex.Maybe
 import io.reactivex.Single
 

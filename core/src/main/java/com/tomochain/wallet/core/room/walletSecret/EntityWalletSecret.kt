@@ -17,9 +17,13 @@ data class EntityWalletSecret(
 
     var createdAt: Long,
 
+    var createdFrom: Int,
+
     var encryptedSeed: String,
 
     var encryptedPKey: String,
+
+    var dbVersion: String,
 
     var metadata: String
 )

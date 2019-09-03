@@ -1,4 +1,4 @@
-package com.tomochain.wallet.core.habak.cryptography
+package com.tomochain.wallet.core.habak.cryptography.legacy
 
 import android.annotation.TargetApi
 import android.content.Context
@@ -10,9 +10,8 @@ import java.util.*
 import javax.security.auth.x500.X500Principal
 import javax.crypto.spec.SecretKeySpec
 import android.util.Base64
-import com.midsummer.habakkeystore.cryptography.oldVersion.encryptManager.EncryptionManager
-import com.midsummer.habakkeystore.cryptography.oldVersion.encryptManager.KeyStoreRecoveryNotifier
 import com.tomochain.wallet.core.habak.EncryptedModel
+import com.tomochain.wallet.core.habak.cryptography.Habak
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.security.*

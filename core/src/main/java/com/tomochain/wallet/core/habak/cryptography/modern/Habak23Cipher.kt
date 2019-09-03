@@ -1,4 +1,4 @@
-package com.tomochain.wallet.core.habak.cryptography
+package com.tomochain.wallet.core.habak.cryptography.modern
 
 import android.annotation.TargetApi
 import android.os.Build
@@ -7,6 +7,7 @@ import android.security.keystore.KeyProperties
 import android.util.Log
 import com.tomochain.wallet.core.habak.Constant
 import com.tomochain.wallet.core.habak.EncryptedModel
+import com.tomochain.wallet.core.habak.cryptography.Habak
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
 import java.security.KeyStore

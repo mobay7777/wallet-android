@@ -1,4 +1,4 @@
-package com.midsummer.habakkeystore.cryptography.oldVersion.encryptManager
+package com.tomochain.wallet.core.habak.cryptography.legacy
 
 import java.security.KeyStore
 

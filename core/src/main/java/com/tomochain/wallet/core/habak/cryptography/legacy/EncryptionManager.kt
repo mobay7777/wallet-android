@@ -1,4 +1,4 @@
-package com.midsummer.habakkeystore.cryptography.oldVersion.encryptManager
+package com.tomochain.wallet.core.habak.cryptography.legacy
 
 import android.annotation.TargetApi
 import android.content.Context

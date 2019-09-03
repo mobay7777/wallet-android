@@ -12,6 +12,8 @@ import com.tomochain.wallet.core.room.walletSecret.EntityWalletSecret
 import io.reactivex.Single
 import org.bitcoinj.crypto.ChildNumber
 import org.bitcoinj.crypto.HDKeyDerivation
+import org.bitcoinj.crypto.HDUtils
+import org.bitcoinj.wallet.DeterministicKeyChain
 import org.bitcoinj.wallet.DeterministicSeed
 import org.web3j.crypto.*
 import org.web3j.utils.Numeric
@@ -48,42 +50,20 @@ class WalletServiceImpl(var habak: Habak?) : WalletService {
     }
 
     override fun createWalletFromMnemonics(mnemonic: String,
-                                           hdPath: String,
-                                           walletName: String??): Single<EntityWalletSecret?> {
+                                           hdPath: String): Single<EntityWalletSecret?> {
         return Single.create {
             try{
-                val pathArray = hdPath.split("/".toRegex()).dropLastWhile {path -> path.isEmpty() }.toTypedArray()
-                val passphrase = ""
-                val list = mnemonic.split(" ")
-                if (list.size != 12){
-                    it.onError(InvalidMnemonicException())
-                    return@create
-                }
-                val creationTimeSeconds = System.currentTimeMillis() / 1000
-                val ds = DeterministicSeed(list, null, passphrase, creationTimeSeconds)
-                val seedBytes = ds.seedBytes
-                var dkKey = HDKeyDerivation.createMasterPrivateKey(seedBytes)
-                for (i in 1 until pathArray.size) {
-                    val childNumber: ChildNumber
-                    childNumber = if (pathArray[i].endsWith("'")) {
-                        val number = Integer.parseInt(pathArray[i].substring(0,
-                            pathArray[i].length - 1))
-                        ChildNumber(number, true)
-                    } else {
-                        val number = Integer.parseInt(pathArray[i])
-                        ChildNumber(number, false)
-                    }
-                    dkKey = HDKeyDerivation.deriveChildKey(dkKey, childNumber)
-                }
-                val keyPair = ECKeyPair.create(dkKey.privKeyBytes)
-                val privateKey = Numeric.toHexStringNoPrefixZeroPadded(keyPair.privateKey, Keys.PRIVATE_KEY_LENGTH_IN_HEX)
-                val c = Credentials.create(privateKey)
+                val seed = DeterministicSeed(mnemonic,null,"",System.currentTimeMillis())
+                val chain = DeterministicKeyChain.builder().seed(seed).build()
+                val keyPath = HDUtils.parsePath(hdPath.toUpperCase().replace("'","H"))
+                val key = chain.getKeyByPath(keyPath, true)
+                val c = Credentials.create(key.privateKeyAsHex)
                 val wallet = EntityWalletSecret(
                     c.address,
                     Calendar.getInstance().timeInMillis,
                     WalletSourceType.MNEMONICS,
                     habak?.encrypt(mnemonic)?.writeToString() ?: "",
-                    habak?.encrypt(privateKey)?.writeToString() ?: "",
+                    habak?.encrypt(key.privateKeyAsHex)?.writeToString() ?: "",
                     Config.Database.VERSION,
                     hdPath)
                 it.onSuccess(wallet)
@@ -94,8 +74,7 @@ class WalletServiceImpl(var habak: Habak?) : WalletService {
         }
     }
 
-    override fun createWalletFromPrivateKey(privateKey: String,
-                                            walletName: String?): Single<EntityWalletSecret?> {
+    override fun createWalletFromPrivateKey(privateKey: String): Single<EntityWalletSecret?> {
         return Single.create{
             try{
                 if (!WalletUtils.isValidPrivateKey(privateKey)){
@@ -120,8 +99,7 @@ class WalletServiceImpl(var habak: Habak?) : WalletService {
         }
     }
 
-    override fun createWalletFromAddress(address: String,
-                                         walletName: String?): Single<EntityWalletSecret?> {
+    override fun createWalletFromAddress(address: String): Single<EntityWalletSecret?> {
         return Single.create{
             try{
                 if (!WalletUtils.isValidAddress(address)){

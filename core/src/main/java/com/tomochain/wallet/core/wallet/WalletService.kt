@@ -15,14 +15,11 @@ interface WalletService {
     fun getWordList() : List<String>
     fun generateMnemonics() : String
     fun createWalletFromMnemonics(mnemonic: String,
-                                  hdPath: String,
-                                  walletName: String? = "") : Single<EntityWalletSecret?>
+                                  hdPath: String = CommonChain.TOMO_CHAIN.getHDPath()) : Single<EntityWalletSecret?>
 
-    fun createWalletFromPrivateKey(privateKey: String,
-                                   walletName: String? = "") : Single<EntityWalletSecret?>
+    fun createWalletFromPrivateKey(privateKey: String) : Single<EntityWalletSecret?>
 
-    fun createWalletFromAddress(address: String,
-                                walletName: String? = "") : Single<EntityWalletSecret?>
+    fun createWalletFromAddress(address: String) : Single<EntityWalletSecret?>
 
 
 

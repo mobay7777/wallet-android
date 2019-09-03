@@ -29,6 +29,10 @@ class BlockChainServiceImpl(var address: String?,
                             var habak: Habak?,
                             var web3j: Web3j?) : BlockChainService {
 
+    override fun setWalletAddress(address: String?) {
+        this.address = address
+    }
+
 
     override fun getAccountBalance(): Single<BigInteger> {
         return Single.create{ emitter ->

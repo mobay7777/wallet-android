@@ -1,5 +1,6 @@
 package com.tomochain.wallet.core.w3jl.components.signer
 
+import com.tomochain.wallet.core.common.BaseService
 import io.reactivex.Single
 import java.math.BigInteger
 
@@ -9,7 +10,7 @@ import java.math.BigInteger
  * Ping me at nienbkict@gmail.com
  * Happy coding ^_^
  */
-interface SignerService {
+interface SignerService : BaseService {
 
     fun signRawMessage( message: String?) : Single<SignResult>?
     fun signMessage( message: String?) : Single<SignResult>?

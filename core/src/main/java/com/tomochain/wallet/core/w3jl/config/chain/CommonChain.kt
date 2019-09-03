@@ -34,7 +34,7 @@ enum class CommonChain : Chain {
         }
 
         override fun getHDPath(): String {
-            return "m/44'/889'/0'/0/"
+            return "M/44H/889H/0H/0/0"
         }
     },
 
@@ -64,7 +64,7 @@ enum class CommonChain : Chain {
         }
 
         override fun getHDPath(): String {
-            return "m/44'/889'/0'/0/"
+            return "M/44H/889H/0H/0/0"
         }
     },
 
@@ -94,7 +94,7 @@ enum class CommonChain : Chain {
         }
 
         override fun getHDPath(): String {
-            return "m/44'/889'/0'/0/"
+            return "M/44H/889H/0H/0/0"
         }
     }
 }

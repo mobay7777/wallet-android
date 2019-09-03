@@ -29,7 +29,9 @@ class SignerServiceImpl(var address: String?,
                         var dao: WalletSecretDAO?,
                         var habak: Habak?,
                         var web3j: Web3j?) : SignerService {
-
+    override fun setWalletAddress(address: String?) {
+        this.address = address
+    }
 
     override fun signRawMessage(message: String?): Single<SignResult>? {
         return dao?.getWallet(address!!)

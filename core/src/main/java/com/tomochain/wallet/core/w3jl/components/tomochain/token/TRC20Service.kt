@@ -1,5 +1,6 @@
 package com.tomochain.wallet.core.w3jl.components.tomochain.token
 
+import com.tomochain.wallet.core.common.BaseService
 import com.tomochain.wallet.core.w3jl.listeners.TransactionListener
 import io.reactivex.Single
 import java.math.BigDecimal
@@ -11,7 +12,7 @@ import java.math.BigInteger
  * Ping me at nienbkict@gmail.com
  * Happy coding ^_^
  */
-interface TRC20Service {
+interface TRC20Service : BaseService{
     fun getBalance(tokenAddress: String) : Single<BigDecimal>
     fun getName(tokenAddress: String) : Single<String>
     fun getSymbol(tokenAddress: String) : Single<String>

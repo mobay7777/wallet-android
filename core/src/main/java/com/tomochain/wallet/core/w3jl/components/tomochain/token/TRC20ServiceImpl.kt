@@ -43,9 +43,11 @@ class TRC20ServiceImpl(var address: String?,
                        var dao: WalletSecretDAO?,
                        var habak: Habak?,
                        var web3j: Web3j?,
-                       var chain: Chain?) :
-    TRC20Service {
+                       var chain: Chain?) : TRC20Service {
 
+    override fun setWalletAddress(address: String?) {
+        this.address = address
+    }
 
     override fun getBalance( tokenAddress: String): Single<BigDecimal> {
         return Single.create{ emitter ->

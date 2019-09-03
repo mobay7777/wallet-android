@@ -1,5 +1,6 @@
 package com.tomochain.wallet.core.w3jl.components.coreBlockchain
 
+import com.tomochain.wallet.core.common.BaseService
 import io.reactivex.Single
 import java.math.BigInteger
 
@@ -9,7 +10,7 @@ import java.math.BigInteger
  * Ping me at nienbkict@gmail.com
  * Happy coding ^_^
  */
-interface BlockChainService {
+interface BlockChainService : BaseService {
 
     fun getAccountBalance(): Single<BigInteger>
     fun getTransactionCount(): Single<BigInteger>

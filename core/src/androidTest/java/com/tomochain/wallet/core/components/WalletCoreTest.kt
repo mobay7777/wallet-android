@@ -1,16 +1,16 @@
 package com.tomochain.wallet.core.components
 
-import androidx.test.InstrumentationRegistry
-
-import androidx.test.runner.AndroidJUnit4
-import com.tomochain.wallet.core.room.walletSecret.EntityWalletSecret
+import android.support.test.InstrumentationRegistry
+import android.support.test.runner.AndroidJUnit4
+import com.tomochain.wallet.core.common.exception.InvalidMnemonicException
+import com.tomochain.wallet.core.common.exception.InvalidPrivateKeyException
+import com.tomochain.wallet.core.common.exception.WalletAlreadyExistedException
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.lang.ref.WeakReference
 import org.junit.Assert.*
-import java.util.function.Predicate
 
 /**
  * Created by cityme on 03,September,2019
@@ -33,11 +33,31 @@ internal class WalletCoreTest {
     }
 
     @Test
+    fun testCoreFunctionService(){
+
+
+        val address = "0x6e7312d1028b70771bb9cdd9837442230a9349ca"
+
+        val service = WalletCore
+                .getInstance()?.coreFunctions
+
+        service?.createWalletFromAddress(address)?.test()?.assertNoErrors()
+
+
+        val allAccount = service?.getAllWallet()?.blockingGet()
+
+        assertEquals(allAccount?.size, 1)
+        assertEquals(allAccount?.get(0)?.address, address)
+
+        service?.createWalletFromAddress(address)?.test()?.assertError(WalletAlreadyExistedException())
+
+
+    }
+
+    @Test
     fun testWalletService(){
 
         val service = WalletCore.getInstance()?.walletService
-
-
         assertEquals("word list size is not 2048",service?.getWordList()?.size,2048)
         assertEquals("mnemonics size is not 12",service?.generateMnemonics()?.split(" ")?.size,12)
 
@@ -54,6 +74,12 @@ internal class WalletCoreTest {
         assertEquals("mnemonic not match address",
             service?.createWalletFromMnemonics(mockMnemonic)?.blockingGet()?.address, mockAddress)
 
+
+        service?.createWalletFromPrivateKey(mockPKey.substring(1))?.test()
+                ?.assertError(InvalidPrivateKeyException())
+
+        service?.createWalletFromMnemonics("embrace canyon orphan supreme cat theory hurt company purse strike pentium stat")?.test()
+                ?.assertError(InvalidMnemonicException())
 
 
     }

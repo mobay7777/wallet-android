@@ -17,7 +17,7 @@ import com.tomochain.wallet.core.common.Config
 @Database(entities = [EntityWalletSecret::class], version = Config.Database.VERSION, exportSchema = false)
 abstract class DatabaseWalletSecret : RoomDatabase(){
 
-    abstract fun walletDAO(): EntityWalletSecret
+    abstract fun walletDAO(): WalletSecretDAO
 
     companion object {
         private var INSTANCE: DatabaseWalletSecret? = null

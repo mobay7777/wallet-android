@@ -34,7 +34,7 @@ class Habak19Cipher(private var alias : String, var context: Context) : Habak {
     override fun initialize() {
         val preference = context.getSharedPreferences(alias, Context.MODE_PRIVATE)
         val keyAliasPrefix = "pr"
-        val bitShiftKey = "tomoWallet2018".toByteArray()
+        val bitShiftKey = "wallet-core".toByteArray()
         encryptionManager = EncryptionManager(context, preference,
                 keyAliasPrefix, bitShiftKey, object : KeyStoreRecoveryNotifier {
             override fun onRecoveryRequired(e: Exception, keyStore: KeyStore, keyAliases: List<String>): Boolean {

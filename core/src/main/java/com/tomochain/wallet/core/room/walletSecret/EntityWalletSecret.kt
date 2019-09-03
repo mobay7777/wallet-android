@@ -23,7 +23,16 @@ data class EntityWalletSecret(
 
     var encryptedPKey: String,
 
-    var dbVersion: String,
+    var dbVersion: Int,
 
     var metadata: String
-)
+){
+    fun clearContent(){
+        createdAt = -1
+        createdFrom = -1
+        encryptedSeed = ""
+        encryptedPKey = ""
+        dbVersion = -1
+        metadata = ""
+    }
+}

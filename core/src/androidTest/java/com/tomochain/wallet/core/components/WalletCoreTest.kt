@@ -122,12 +122,40 @@ internal class WalletCoreTest {
             "0x6e7312d1028b70771bb9cdd9837442230a9349ca",
             ConvertUtil.toWei("1", ConvertUtil.Unit.ETHER).toBigInteger(),
             BigInteger("250000000"),
-            BigInteger("21000"),null
+            BigInteger("100000"),
+                    "Google Play: Google Play is a collection of services that allow users to discover, install, and purchase applications from their Android device or the web. Google Play makes it easy for developers to reach Android users and potential customers. Google Play also provides community review, application license verification, application security scanning, and other security services" +
+                    "Android updates: The Android update service delivers new capabilities and security updates to selected Android devices, including updates through the web or over the air (OTA)" +
+                    "Application services: Frameworks that allow Android applications to use cloud capabilities such as (backing up) application data and settings and cloud-to-device messaging (C2DM) for push messaging" +
+                    "Verify Apps: Warn or automatically block the installation of harmful applications, and continually scan applications on the device, warning about or removing harmful apps" +
+                    "SafetyNet: A privacy preserving intrusion detection system to assist Google tracking and mitigating known security threats in addition to identifying new security threats" +
+                    "SafetyNet Attestation: Third-party API to determine whether the device is CTS compatible. Attestation can also assist identify the Android app communicating with the app server" +
+                    "Android Device Manager: A web app and Android app to locate lost or stolen device."
         )?.test()?.assertValue {
             it.length == 66
         }
 
-        WalletCore.getInstance("0x06605b28aab9835be75ca242a8ae58f2e15f2f45")
+        coreBlockChainService?.estimateTransactionFee(
+            "0x6e7312d1028b70771bb9cdd9837442230a9349ca",
+            ConvertUtil.toWei("1", ConvertUtil.Unit.ETHER).toBigInteger(),"Google provides a set of cloud-based services that are available to compatible Android devices with Google Mobile Services. While these services are not part of the Android Open Source Project, they are included on many Android devices. For more information on some of these services, see Android Security’s 2017 Year in Review" +
+                   
+                    "The primary Google security services are:" +
+                  
+                    "Google Play: Google Play is a collection of services that allow users to discover, install, and purchase applications from their Android device or the web. Google Play makes it easy for developers to reach Android users and potential customers. Google Play also provides community review, application license verification, application security scanning, and other security services" +
+                    "Android updates: The Android update service delivers new capabilities and security updates to selected Android devices, including updates through the web or over the air (OTA)" +
+                    "Application services: Frameworks that allow Android applications to use cloud capabilities such as (backing up) application data and settings and cloud-to-device messaging (C2DM) for push messaging" +
+                    "Verify Apps: Warn or automatically block the installation of harmful applications, and continually scan applications on the device, warning about or removing harmful apps" +
+                    "SafetyNet: A privacy preserving intrusion detection system to assist Google tracking and mitigating known security threats in addition to identifying new security threats" +
+                    "SafetyNet Attestation: Third-party API to determine whether the device is CTS compatible. Attestation can also assist identify the Android app communicating with the app server" +
+                    "Android Device Manager: A web app and Android app to locate lost or stolen device."
+        )?.subscribe(
+            {
+                Log.d(LOG, "estimateTransactionFee > success: $it")
+            },{
+                Log.d(LOG, "estimateTransactionFee > fail: $it")
+            }
+        )
+
+        /*WalletCore.getInstance("0x06605b28aab9835be75ca242a8ae58f2e15f2f45")
             ?.trC20Service
             ?.transferToken(
                 "0x9afff1e2657e3b87b9ccc9cc9a3fc1ed2f177b8a",
@@ -148,7 +176,7 @@ internal class WalletCoreTest {
                     override fun onTransactionError(e: Exception) {
                         Log.d(LOG, "transferToken > onTransactionError: $e")
                     }
-                })
+                })*/
     }
 
     @Test

@@ -16,6 +16,15 @@ class Config {
     }
 
 
+    class Transaction{
+        companion object{
+            const val DEFAULT_GAS_PRICE = "300000000"
+            const val DEFAULT_GAS_LIMIT = "50000"
+            const val DEFAULT_GAS_LIMIT_CONTRACT_CALL = "500000"
+        }
+    }
+
+
     class HDPath {
         companion object {
             const val TOMO = "m/44'/889'/0'/0/0"

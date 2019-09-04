@@ -1,6 +1,7 @@
 package com.tomochain.wallet.core.w3jl.components.coreBlockchain
 
 import android.util.Log
+import com.tomochain.wallet.core.common.Config
 import com.tomochain.wallet.core.common.LogTag
 import com.tomochain.wallet.core.common.exception.InvalidAddressException
 import com.tomochain.wallet.core.common.exception.WalletNotFoundException
@@ -15,7 +16,9 @@ import org.web3j.crypto.TransactionEncoder
 import org.web3j.crypto.WalletUtils
 import org.web3j.protocol.Web3j
 import org.web3j.protocol.core.DefaultBlockParameterName
+import org.web3j.protocol.core.methods.request.Transaction
 import org.web3j.utils.Numeric
+import java.lang.NullPointerException
 import java.math.BigInteger
 
 /**
@@ -90,6 +93,48 @@ class BlockChainServiceImpl(var address: String?,
                 //emitter.tryOnError(e)
                 Log.e(LogTag.TAG_W3JL,"CoreBlockChainServiceImpl > getTransactionCount: ${e.localizedMessage}")
                 emitter.onSuccess(BigInteger.ZERO)
+            }
+        }
+    }
+
+    override fun estimateTransactionFee(
+        recipient: String,
+        amount: BigInteger?,
+        payload: String?
+    ): Single<BigInteger> {
+        return Single.create {emitter ->
+            try {
+                val ethGetTransactionCount = web3j?.ethGetTransactionCount(
+                    address, DefaultBlockParameterName.LATEST)?.sendAsync()?.get()
+                val nonce = ethGetTransactionCount?.transactionCount
+                val transaction = Transaction.createFunctionCallTransaction(
+                    address?.toLowerCase(), nonce,
+                    BigInteger(Config.Transaction.DEFAULT_GAS_PRICE),
+                    BigInteger(Config.Transaction.DEFAULT_GAS_LIMIT),
+                    recipient.toLowerCase(), amount, "abc")
+
+                val rawTransaction = if (payload == null || payload.isEmpty()){
+                    Transaction.createEtherTransaction(
+                        address,nonce, BigInteger(Config.Transaction.DEFAULT_GAS_PRICE),
+                        BigInteger(Config.Transaction.DEFAULT_GAS_LIMIT), recipient, amount)
+                }
+                else{
+                    Transaction.createEthCallTransaction(address, recipient, payload)
+                }
+
+
+                val response = web3j?.ethEstimateGas(rawTransaction)?.sendAsync()?.get()
+                if (response != null && response.result != null){
+                    try {
+                        emitter.onSuccess(BigInteger(Numeric.cleanHexPrefix(response.result),16))
+                    }catch (e: Exception){
+                        emitter.onError(e)
+                    }
+                }else{
+                    emitter.onError(NullPointerException(response?.error?.message))
+                }
+            } catch (e: Exception) {
+                emitter.onError(e)
             }
         }
     }

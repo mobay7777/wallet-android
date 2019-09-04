@@ -131,10 +131,8 @@ class CoreFunctionsImpl(var habak: Habak?,
                     .subscribe(
                         {
                             emitter.onError(WalletAlreadyExistedException())
-                            return@subscribe
                         },
                         {
-
                             dao!!.walletDAO().addNewWallet(entityWalletKey)
                                 .subscribe({
                                     emitter.onSuccess(entityWalletKey.address)
@@ -143,7 +141,6 @@ class CoreFunctionsImpl(var habak: Habak?,
                                     entityWalletKey.clearContent()
                                     emitter.onError(t)
                                 })
-
                         }
                     )
             }catch(t: Throwable){
@@ -186,7 +183,7 @@ class CoreFunctionsImpl(var habak: Habak?,
                 }
                 dao!!.walletDAO().getWallet(address!!).subscribe(
                     { wallet ->
-                        emitter.onSuccess(wallet)
+                        emitter.onSuccess(wallet!!)
                     },{ t ->
                         emitter.onError(t)
                     }

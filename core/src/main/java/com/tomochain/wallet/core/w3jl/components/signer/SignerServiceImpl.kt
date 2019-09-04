@@ -35,7 +35,7 @@ class SignerServiceImpl(var address: String?,
 
     override fun signRawMessage(message: String?): Single<SignResult>? {
         return dao?.getWallet(address!!)
-            ?.flatMapSingle {wallet ->
+            ?.flatMap {wallet ->
                 Single.create<SignResult> {
                     try{
                         val pKey = habak?.decrypt(EncryptedModel.readFromString(wallet.encryptedPKey))
@@ -105,7 +105,7 @@ class SignerServiceImpl(var address: String?,
 
     override fun signPersonalMessage(message: String?): Single<SignResult>? {
         return dao?.getWallet(address!!)
-            ?.flatMapSingle {wallet ->
+            ?.flatMap {wallet ->
                 Single.create<SignResult> {
                     try{
                         val pKey = habak?.decrypt(EncryptedModel.readFromString(wallet.encryptedPKey))
@@ -177,7 +177,7 @@ class SignerServiceImpl(var address: String?,
         payload: String?
     ): Single<SignResult>? {
         return dao?.getWallet(address!!)
-            ?.flatMapSingle {wallet ->
+            ?.flatMap {wallet ->
                 Single.create<SignResult> {
                     try{
                         val pKey = habak?.decrypt(EncryptedModel.readFromString(wallet.encryptedPKey))

@@ -9,6 +9,7 @@ import com.tomochain.wallet.core.common.exception.InvalidMnemonicException
 import com.tomochain.wallet.core.common.exception.InvalidPrivateKeyException
 import com.tomochain.wallet.core.habak.cryptography.Habak
 import com.tomochain.wallet.core.room.walletSecret.EntityWalletSecret
+import com.tomochain.wallet.core.w3jl.utils.WalletUtil
 import io.reactivex.Single
 import org.bitcoinj.crypto.ChildNumber
 import org.bitcoinj.crypto.HDKeyDerivation
@@ -53,6 +54,12 @@ class WalletServiceImpl(var habak: Habak?) : WalletService {
                                            hdPath: String): Single<EntityWalletSecret?> {
         return Single.create {
             try{
+
+
+                if (!WalletUtil.isValidMnemonics(mnemonic, true)){
+                    it.onError(InvalidMnemonicException())
+                    return@create
+                }
                 val seed = DeterministicSeed(mnemonic,null,"",System.currentTimeMillis())
                 val chain = DeterministicKeyChain.builder().seed(seed).build()
                 val keyPath = HDUtils.parsePath(hdPath.toUpperCase().replace("'","H"))

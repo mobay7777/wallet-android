@@ -34,16 +34,7 @@ object WalletUtil {
 
     fun isValidMnemonics(mnemonics: String?, matchCurrentWordList: Boolean) : Boolean{
         return try{
-            val list = mnemonics?.toLowerCase()?.split(" ")
-
-            if (list?.size != 12)  false
-
-            if (matchCurrentWordList){
-
-            }
-
-
-            true
+            mnemonics?.toLowerCase()?.split(" ")?.size == 12
         }catch(t: Throwable){
             Log.e(LogTag.TAG_W3JL, "isValidMnemonics",t)
             false

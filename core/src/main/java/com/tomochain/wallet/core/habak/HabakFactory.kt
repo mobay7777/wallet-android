@@ -37,14 +37,18 @@ class HabakFactory(var context: Context?) {
         requireNotNull(alias, lazyMessage = { "alias must not be null!" })
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
 
-            if (password.isBlank()) {
+            val h23 = if (password.isBlank()) {
                 Habak23Cipher(alias!!)
             } else {
                 Habak23WithPasswordCipher(alias!!, password)
             }
+            h23.initialize()
+            h23
         }
         else{
-            Habak19Cipher(alias!!, context!!)
+            val h19 = Habak19Cipher(alias!!, context!!)
+            h19.initialize()
+            h19
         }
     }
 }

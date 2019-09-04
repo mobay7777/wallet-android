@@ -14,10 +14,10 @@ import io.reactivex.Single
 interface WalletSecretDAO {
 
     @Query("SELECT * FROM EntityWalletSecret")
-    fun getAllWallet() : Maybe<List<EntityWalletSecret>>
+    fun getAllWallet() : Single<List<EntityWalletSecret>>
 
     @Query("SELECT * FROM EntityWalletSecret WHERE address = :address LIMIT 1")
-    fun getWallet(address: String) : Maybe<EntityWalletSecret>
+    fun getWallet(address: String) : Single<EntityWalletSecret?>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun addNewWallet(wallet: EntityWalletSecret) : Single<Long>

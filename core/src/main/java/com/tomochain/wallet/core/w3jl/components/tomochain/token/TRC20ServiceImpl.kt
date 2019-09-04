@@ -180,7 +180,7 @@ class TRC20ServiceImpl(var address: String?,
                     if (wallet == null){
                         callback?.onTransactionError(WalletNotFoundException())
                     }
-                    val pKey = habak?.decrypt(EncryptedModel.readFromString(wallet.encryptedPKey))
+                    val pKey = habak?.decrypt(EncryptedModel.readFromString(wallet!!.encryptedPKey))
                     if ( !WalletUtil.isValidPrivateKey(pKey.toString())){
                         callback?.onTransactionError(InvalidAddressException())
                         pKey?.clear()
@@ -210,8 +210,13 @@ class TRC20ServiceImpl(var address: String?,
                             gasPrice,
                             gasLimit
                         )
-                    val t = tokenContract.transfer(recipient, amount).sendAsync().get()
-                    callback?.onTransactionCreated(t.transactionHash)
+                    tokenContract.transfer(recipient, amount).flowable()
+                        .subscribe({ t ->
+                            callback?.onTransactionCreated(t.transactionHash)
+                        },{e ->
+                            callback?.onTransactionError(e as Exception)
+                        })
+
                 },{
                     callback?.onTransactionError(it as Exception)
                 }

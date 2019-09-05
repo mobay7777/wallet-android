@@ -32,6 +32,10 @@ object WalletUtil {
         return WalletUtils.isValidPrivateKey(privateKey)
     }
 
+    fun isValidTransactionHash(txHash: String?) : Boolean{
+        return txHash?.length == 66 && txHash.startsWith("0x", true)
+    }
+
     fun isValidMnemonics(mnemonics: String?, matchCurrentWordList: Boolean) : Boolean{
         return try{
             mnemonics?.toLowerCase()?.split(" ")?.size == 12

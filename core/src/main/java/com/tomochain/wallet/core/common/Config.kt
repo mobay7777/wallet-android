@@ -18,8 +18,9 @@ class Config {
 
     class Transaction{
         companion object{
-            const val DEFAULT_GAS_PRICE = "300000000"
-            const val DEFAULT_GAS_LIMIT = "50000"
+            const val DEFAULT_GAS_PRICE = "250000000"
+            const val DEFAULT_GAS_LIMIT = "21000"
+            const val DEFAULT_GAS_LIMIT_WITH_PAYLOAD = "100000"
             const val DEFAULT_GAS_LIMIT_CONTRACT_CALL = "500000"
         }
     }

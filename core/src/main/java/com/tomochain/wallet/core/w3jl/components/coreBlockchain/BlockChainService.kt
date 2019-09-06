@@ -20,6 +20,7 @@ interface BlockChainService : BaseService {
 
     fun getAccountBalance(): Single<BigInteger>
     fun getTransactionCount(): Single<BigInteger>
+
     fun transfer(
         recipient: String,
         amount: BigInteger?,

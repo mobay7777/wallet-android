@@ -264,7 +264,5 @@ class BlockChainServiceImpl(var address: String?,
             ?.takeUntil {
                 it.contains("0x", true)
             }
-
-
     }
 }

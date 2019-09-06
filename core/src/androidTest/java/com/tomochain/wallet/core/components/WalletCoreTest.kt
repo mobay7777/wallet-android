@@ -8,6 +8,7 @@ import androidx.test.runner.AndroidJUnit4
 import com.tomochain.wallet.core.common.exception.InvalidMnemonicException
 import com.tomochain.wallet.core.common.exception.InvalidPrivateKeyException
 import com.tomochain.wallet.core.common.exception.WalletAlreadyExistedException
+import com.tomochain.wallet.core.w3jl.components.tomochain.token.TokenInfo
 import com.tomochain.wallet.core.w3jl.config.chain.Chain
 import com.tomochain.wallet.core.w3jl.config.chain.CommonChain
 import com.tomochain.wallet.core.w3jl.listeners.TransactionListener
@@ -40,7 +41,7 @@ internal class WalletCoreTest {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         WalletCore.setup(WeakReference(context), object : CoreConfig(){
             override fun chain(): Chain {
-                return CommonChain.TOMO_CHAIN_TEST_NET
+                return CommonChain.TOMO_CHAIN
             }
 
             override fun habakAlias(): String {
@@ -59,6 +60,69 @@ internal class WalletCoreTest {
     }
 
     @Test
+    fun testToken(){
+        val token = WalletCore.getInstance("0x06605b28aab9835be75ca242a8ae58f2e15f2f45")
+            ?.trc20TokenService
+
+        token?.getTokenInfo("0x30c83c01836efb367fad1c03247327988c35aeaf")
+            ?.subscribe(
+                {
+                    Log.d(LOG, "getTokenInfo > onSuccess: $it")
+                },{
+                    Log.e(LOG, "getTokenInfo > error: $it")
+                }
+            )
+
+        token?.getBalance("0x3e86b7367d9b9669e09d6e9b8ec025baa372b241")
+            ?.subscribe(
+                {
+                    Log.d(LOG, "getBalance > onSuccess: $it")
+                },{
+                    Log.e(LOG, "getBalance > error: $it")
+                }
+            )
+
+        token?.getBalance(TokenInfo("0x3e86b7367d9b9669e09d6e9b8ec025baa372b241", "HayTraoChoAnh", "MTP", 18))
+            ?.subscribe(
+                {
+                    Log.d(LOG, "getBalance > onSuccess: $it")
+                },{
+                    Log.e(LOG, "getBalance > error: $it")
+                }
+            )
+
+        token?.transferToken("0x3d05de67538b3dafc757f970424eabce6b061bc2",
+            "0x6e7312d1028b70771bb9cdd9837442230a9349ca",
+            BigInteger("1").multiply(BigInteger.TEN.pow(18)), callback = object : TransactionListener{
+                override fun onTransactionCreated(txId: String) {
+                    Log.d(LOG,"transferToken > onTransactionCreated: $txId")
+                }
+
+                override fun onTransactionComplete(txId: String, status: String) {
+                    Log.d(LOG,"transferToken > onTransactionComplete: $txId $status")
+                }
+
+                override fun onTransactionError(e: Exception) {
+                    Log.d(LOG,"transferToken > onTransactionError: $e")
+                }
+            }, gasLimit = BigInteger("100000")
+        )
+
+
+        token?.estimateTokenTransferGas("0x3d05de67538b3dafc757f970424eabce6b061bc2",
+            "0x6e7312d1028b70771bb9cdd9837442230a9349ca",
+            BigInteger("1").multiply(BigInteger.TEN.pow(18)))
+            ?.subscribe(
+                {
+                    Log.d(LOG, "estimateTokenTransferGas > onSuccess: $it")
+                },{
+                    Log.e(LOG, "estimateTokenTransferGas > error: $it")
+                }
+            )
+    }
+
+
+    //@Test
     fun testCoreFunctionService(){
 
 

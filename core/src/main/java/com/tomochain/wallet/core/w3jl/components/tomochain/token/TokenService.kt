@@ -1,6 +1,7 @@
 package com.tomochain.wallet.core.w3jl.components.tomochain.token
 
 import com.tomochain.wallet.core.common.BaseService
+import com.tomochain.wallet.core.common.Config
 import com.tomochain.wallet.core.w3jl.listeners.TransactionListener
 import io.reactivex.Single
 import java.math.BigDecimal
@@ -21,4 +22,7 @@ interface TokenService : BaseService {
     fun getSymbol(tokenAddress: String?) : Single<String>
     fun getDecimal(tokenAddress: String?) : Single<Int>
     fun getTokenInfo(tokenAddress: String?) : Single<TokenInfo?>
+
+
+
 }

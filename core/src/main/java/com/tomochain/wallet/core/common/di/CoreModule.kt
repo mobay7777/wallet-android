@@ -12,9 +12,7 @@ import com.tomochain.wallet.core.w3jl.components.coreBlockchain.BlockChainServic
 import com.tomochain.wallet.core.w3jl.components.coreBlockchain.BlockChainServiceImpl
 import com.tomochain.wallet.core.w3jl.components.signer.SignerService
 import com.tomochain.wallet.core.w3jl.components.signer.SignerServiceImpl
-import com.tomochain.wallet.core.w3jl.components.tomochain.token.TRC20ServiceImpl
-import com.tomochain.wallet.core.w3jl.components.tomochain.token.TokenService
-import com.tomochain.wallet.core.w3jl.components.tomochain.token.TokenServiceImpl
+import com.tomochain.wallet.core.w3jl.components.tomochain.token.*
 import com.tomochain.wallet.core.wallet.WalletService
 import com.tomochain.wallet.core.wallet.WalletServiceImpl
 import dagger.Module
@@ -82,7 +80,21 @@ class CoreModule(var context: WeakReference<Context>,
 
 
     @Provides
-    fun getTRC20Service() : TRC20ServiceImpl {
-        return TRC20ServiceImpl(null, getWeb3JService(), config.chain(), getDatabaseWallet().walletDAO(), getHaBak())
+    fun getTRC20Service() : TRC20Service {
+        return TRC20ServiceImpl(null,
+                getWeb3JService(),
+                config.chain(),
+                getDatabaseWallet().walletDAO(),
+                getHaBak(),getCoreBlockChainService())
+    }
+
+
+    @Provides
+    fun getTRC21Service() : TRC21Service {
+        return TRC21ServiceImpl(null,
+                getWeb3JService(),
+                config.chain(),
+                getDatabaseWallet().walletDAO(),
+                getHaBak(),getCoreBlockChainService())
     }
 }

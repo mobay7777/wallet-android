@@ -175,6 +175,9 @@ open class TokenServiceImpl(open var address: String?,
 
 
 
+
+
+
     protected fun callSmartContractFunction(function: Function, contractAddress: String, address: String): String? {
         val encodedFunction = FunctionEncoder.encode(function)
         val response = web3j?.ethCall(

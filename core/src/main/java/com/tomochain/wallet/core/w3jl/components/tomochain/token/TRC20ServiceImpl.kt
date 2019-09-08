@@ -4,12 +4,13 @@ import android.annotation.SuppressLint
 import android.util.Log
 import com.tomochain.wallet.core.common.Config
 import com.tomochain.wallet.core.common.LogTag
+import com.tomochain.wallet.core.common.exception.InsufficientBalanceException
 import com.tomochain.wallet.core.common.exception.InvalidAddressException
 import com.tomochain.wallet.core.common.exception.InvalidPrivateKeyException
-import com.tomochain.wallet.core.common.exception.WalletNotFoundException
 import com.tomochain.wallet.core.habak.EncryptedModel
 import com.tomochain.wallet.core.habak.cryptography.Habak
 import com.tomochain.wallet.core.room.walletSecret.WalletSecretDAO
+import com.tomochain.wallet.core.w3jl.components.coreBlockchain.BlockChainService
 import com.tomochain.wallet.core.w3jl.config.chain.Chain
 import com.tomochain.wallet.core.w3jl.listeners.TransactionListener
 import com.tomochain.wallet.core.w3jl.utils.WalletUtil
@@ -18,7 +19,6 @@ import org.web3j.abi.FunctionEncoder
 import org.web3j.abi.TypeReference
 import org.web3j.abi.datatypes.Address
 import org.web3j.abi.datatypes.Bool
-import org.web3j.abi.datatypes.Utf8String
 import org.web3j.crypto.Credentials
 import org.web3j.abi.datatypes.Function
 import org.web3j.abi.datatypes.generated.Uint256
@@ -27,7 +27,6 @@ import org.web3j.crypto.TransactionEncoder
 import org.web3j.protocol.Web3j
 import org.web3j.protocol.core.DefaultBlockParameterName
 import org.web3j.protocol.core.methods.request.Transaction
-import org.web3j.tx.response.QueuingTransactionReceiptProcessor
 import org.web3j.utils.Numeric
 import java.math.BigInteger
 
@@ -37,11 +36,12 @@ import java.math.BigInteger
  * Ping me at nienbkict@gmail.com
  * Happy coding ^_^
  */
-class TRC20ServiceImpl(override var address: String?,
-                       override var web3j: Web3j?,
-                       override var chain: Chain?,
-                       private var dao: WalletSecretDAO?,
-                       private var habak: Habak?) : TokenServiceImpl(address, web3j, chain), TRC20Service {
+class TRC20ServiceImpl( override var address: String?,
+                        override var web3j: Web3j?,
+                        override var chain: Chain?,
+                        private var dao: WalletSecretDAO?,
+                        private var habak: Habak?,
+                        private var coreBlockChainService: BlockChainService?) : TokenServiceImpl(address, web3j, chain), TRC20Service {
 
     @SuppressLint("CheckResult")
     override fun transferToken(
@@ -53,7 +53,7 @@ class TRC20ServiceImpl(override var address: String?,
         gasLimit: BigInteger?
     ) {
         try {
-            if (!WalletUtil.isValidAddress(address)){
+            if (!WalletUtil.isValidAddress(address) || !WalletUtil.isValidAddress(tokenAddress)){
                 callback?.onTransactionError(InvalidAddressException())
                 return
             }
@@ -75,17 +75,17 @@ class TRC20ServiceImpl(override var address: String?,
                     val credentials = Credentials.create(pKey.toString())
                     pKey?.clear()
 
+                    val tokenBalance = getBalance(tokenAddress).blockingGet()
+                    if (tokenBalance < amount){
+                        callback?.onTransactionError(InsufficientBalanceException())
+                        return@subscribe
+                    }
+
                     val function = Function(
                         "transfer",
-                        listOf(
-                            Address(recipient),
-                            Uint256(amount)
-                        ),
-                        listOf(object : TypeReference<Bool>() {
-
-                        }))
+                        listOf(Address(recipient), Uint256(amount)),
+                        listOf(object : TypeReference<Bool>() {}))
                     val encodedFunction = FunctionEncoder.encode(function)
-
 
                     val calculatedGasLimit = if (gasLimit == null){
                         val response =web3j?.ethEstimateGas(Transaction
@@ -103,6 +103,18 @@ class TRC20ServiceImpl(override var address: String?,
                     }else{
                         gasLimit
                     }
+
+
+                    val transactionFee = calculatedGasLimit.multiply(gasPrice)
+                    val availableTOMO = coreBlockChainService
+                            ?.getAccountBalance()?.blockingGet() ?: BigInteger.ZERO
+
+                    if (availableTOMO < transactionFee){
+                        callback?.onTransactionError(InsufficientBalanceException
+                            ("This transaction require $transactionFee wei as fee. Your balance is $availableTOMO wei"))
+                        return@subscribe
+                    }
+
 
                     Log.d(LogTag.TAG_W3JL, "calculatedGasLimit: $calculatedGasLimit")
                     val rawTransaction = RawTransaction
@@ -130,36 +142,6 @@ class TRC20ServiceImpl(override var address: String?,
                     }, {
                         callback?.onTransactionError(it as Exception)
                     })
-
-                    /*val tokenContract =
-                        TRC20(
-                            tokenAddress,
-                            web3j,
-                            credentials,
-                            gasPrice,
-                            gasLimit
-                        )
-                    tokenContract.transfer(recipient, amount).flowable()
-                        .subscribe({ t ->
-                            callback?.onTransactionCreated(t.transactionHash)
-                            web3j?.ethGetTransactionReceipt(t.transactionHash)
-                                ?.flowable()
-                                ?.toObservable()
-                                ?.repeat()
-                                ?.map { r ->
-                                    r.result.status
-                                }
-                                ?.takeUntil {
-                                    it.contains("0x", true)
-                                }
-                                ?.retry()
-                                ?.subscribe {
-                                    callback?.onTransactionComplete(t.transactionHash, it)
-                                }
-                        },{e ->
-                            callback?.onTransactionError(e as Exception)
-                        })*/
-
                 },{
                     callback?.onTransactionError(it as Exception)
                 }
@@ -169,7 +151,7 @@ class TRC20ServiceImpl(override var address: String?,
         }
     }
 
-    override fun estimateTokenTransferGas(tokenAddress: String,
+    override fun estimateTokenTransferGasLimit(tokenAddress: String,
                                           recipient: String,
                                           amount: BigInteger): Single<BigInteger> {
         return Single.create { emitter ->

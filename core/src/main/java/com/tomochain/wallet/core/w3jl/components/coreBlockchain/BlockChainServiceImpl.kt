@@ -6,7 +6,6 @@ import com.tomochain.wallet.core.common.Config
 import com.tomochain.wallet.core.common.LogTag
 import com.tomochain.wallet.core.common.exception.InsufficientBalanceException
 import com.tomochain.wallet.core.common.exception.InvalidAddressException
-import com.tomochain.wallet.core.common.exception.InvalidTransactionHashException
 import com.tomochain.wallet.core.common.exception.WalletNotFoundException
 import com.tomochain.wallet.core.habak.EncryptedModel
 import com.tomochain.wallet.core.habak.cryptography.Habak
@@ -14,23 +13,13 @@ import com.tomochain.wallet.core.room.walletSecret.WalletSecretDAO
 import com.tomochain.wallet.core.w3jl.listeners.TransactionListener
 import com.tomochain.wallet.core.w3jl.utils.WalletUtil
 import io.reactivex.*
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
 import org.web3j.crypto.Credentials
 import org.web3j.crypto.RawTransaction
 import org.web3j.crypto.TransactionEncoder
-import org.web3j.crypto.WalletUtils
 import org.web3j.protocol.Web3j
 import org.web3j.protocol.core.DefaultBlockParameterName
-import org.web3j.protocol.core.methods.request.Transaction
-import org.web3j.protocol.core.methods.response.EthGetTransactionReceipt
 import org.web3j.utils.Numeric
-import java.lang.NullPointerException
 import java.math.BigInteger
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.atomic.AtomicLong
 
 
 /**
@@ -130,7 +119,7 @@ class BlockChainServiceImpl(var address: String?,
                 }
 
                 if (getAccountBalance().blockingGet() <= amount){
-                    emitter.onError(InsufficientBalanceException())
+                    emitter.onError(InsufficientBalanceException(""))
                     return@create
                 }
                 val pKey = habak?.decrypt(EncryptedModel.readFromString(wallet.encryptedPKey))
@@ -196,7 +185,7 @@ class BlockChainServiceImpl(var address: String?,
                 return
             }
             if (getAccountBalance().blockingGet() <= amount){
-                callback?.onTransactionError(InsufficientBalanceException())
+                callback?.onTransactionError(InsufficientBalanceException(""))
                 return
             }
             val pKey = habak?.decrypt(EncryptedModel.readFromString(wallet.encryptedPKey))

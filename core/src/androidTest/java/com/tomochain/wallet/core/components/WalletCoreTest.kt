@@ -1,10 +1,11 @@
 package com.tomochain.wallet.core.components
 
 import android.provider.Settings
+import android.support.test.InstrumentationRegistry
+import android.support.test.rule.GrantPermissionRule
+import android.support.test.runner.AndroidJUnit4
 import android.util.Log
-import androidx.test.InstrumentationRegistry
-import androidx.test.rule.GrantPermissionRule
-import androidx.test.runner.AndroidJUnit4
+
 import com.tomochain.wallet.core.common.exception.InvalidMnemonicException
 import com.tomochain.wallet.core.common.exception.InvalidPrivateKeyException
 import com.tomochain.wallet.core.common.exception.WalletAlreadyExistedException

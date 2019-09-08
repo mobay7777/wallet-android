@@ -6,7 +6,9 @@ import com.tomochain.wallet.core.common.di.CoreModule
 import com.tomochain.wallet.core.common.di.DaggerCoreComponent
 import com.tomochain.wallet.core.w3jl.components.coreBlockchain.BlockChainService
 import com.tomochain.wallet.core.w3jl.components.signer.SignerService
+import com.tomochain.wallet.core.w3jl.components.tomochain.token.TRC20Service
 import com.tomochain.wallet.core.w3jl.components.tomochain.token.TRC20ServiceImpl
+import com.tomochain.wallet.core.w3jl.components.tomochain.token.TRC21Service
 import com.tomochain.wallet.core.w3jl.components.tomochain.token.TokenService
 import com.tomochain.wallet.core.wallet.WalletService
 import java.lang.ref.WeakReference
@@ -32,7 +34,9 @@ class WalletCore {
     @Inject
     lateinit var tokenService: TokenService
     @Inject
-    lateinit var trc20TokenService: TRC20ServiceImpl
+    lateinit var trc20TokenService: TRC20Service
+    @Inject
+    lateinit var trc21TokenService: TRC21Service
     @Inject
     lateinit var coreFunctions : CoreFunctions
     @Inject
@@ -55,6 +59,7 @@ class WalletCore {
             instance?.signerService?.setWalletAddress(address)
             instance?.tokenService?.setWalletAddress(address)
             instance?.trc20TokenService?.setWalletAddress(address)
+            instance?.trc21TokenService?.setWalletAddress(address)
 
             return instance
         }

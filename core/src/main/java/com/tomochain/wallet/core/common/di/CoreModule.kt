@@ -64,12 +64,12 @@ class CoreModule(var context: WeakReference<Context>,
 
     @Provides
     fun getSignerService() : SignerService {
-        return SignerServiceImpl(null, getDatabaseWallet().walletDAO(), getHaBak(), getWeb3JService())
+        return SignerServiceImpl(null, getCoreFunctions(), getHaBak(), getWeb3JService())
     }
 
     @Provides
     fun getCoreBlockChainService() : BlockChainService {
-        return BlockChainServiceImpl(null, getDatabaseWallet().walletDAO(), getHaBak(), getWeb3JService())
+        return BlockChainServiceImpl(null, getCoreFunctions(), getHaBak(), getWeb3JService())
     }
 
     @Provides
@@ -84,7 +84,7 @@ class CoreModule(var context: WeakReference<Context>,
         return TRC20ServiceImpl(null,
                 getWeb3JService(),
                 config.chain(),
-                getDatabaseWallet().walletDAO(),
+                getCoreFunctions(),
                 getHaBak(),getCoreBlockChainService())
     }
 
@@ -94,7 +94,7 @@ class CoreModule(var context: WeakReference<Context>,
         return TRC21ServiceImpl(null,
                 getWeb3JService(),
                 config.chain(),
-                getDatabaseWallet().walletDAO(),
+                getCoreFunctions(),
                 getHaBak(),getCoreBlockChainService())
     }
 }

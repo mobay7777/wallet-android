@@ -7,6 +7,7 @@ import com.tomochain.wallet.core.common.LogTag
 import com.tomochain.wallet.core.common.exception.InsufficientBalanceException
 import com.tomochain.wallet.core.common.exception.InvalidAddressException
 import com.tomochain.wallet.core.common.exception.InvalidPrivateKeyException
+import com.tomochain.wallet.core.components.CoreFunctions
 import com.tomochain.wallet.core.habak.EncryptedModel
 import com.tomochain.wallet.core.habak.cryptography.Habak
 import com.tomochain.wallet.core.room.walletSecret.WalletSecretDAO
@@ -47,7 +48,7 @@ import java.util.concurrent.TimeUnit
 class TRC21ServiceImpl(override var address: String?,
                        override var web3j: Web3j?,
                        override var chain: Chain?,
-                       private var dao: WalletSecretDAO?,
+                       private var coreFunctions: CoreFunctions?,
                        private var habak: Habak?,
                        private var coreBlockChainService: BlockChainService?) : TokenServiceImpl(address, web3j, chain), TRC21Service {
 
@@ -71,7 +72,7 @@ class TRC21ServiceImpl(override var address: String?,
                 callback?.onTransactionError(InvalidAddressException())
                 return
             }
-            dao?.getWallet(address!!)?.subscribe(
+            coreFunctions?.getWalletByAddress(address!!)?.subscribe(
                     { wallet ->
                         if (!WalletUtil.isValidAddress(address) || !WalletUtil.isValidAddress(tokenAddress) ){
                             callback?.onTransactionError(InvalidAddressException())

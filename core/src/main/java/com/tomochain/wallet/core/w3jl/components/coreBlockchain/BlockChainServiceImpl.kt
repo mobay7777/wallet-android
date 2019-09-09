@@ -7,6 +7,7 @@ import com.tomochain.wallet.core.common.LogTag
 import com.tomochain.wallet.core.common.exception.InsufficientBalanceException
 import com.tomochain.wallet.core.common.exception.InvalidAddressException
 import com.tomochain.wallet.core.common.exception.WalletNotFoundException
+import com.tomochain.wallet.core.components.CoreFunctions
 import com.tomochain.wallet.core.habak.EncryptedModel
 import com.tomochain.wallet.core.habak.cryptography.Habak
 import com.tomochain.wallet.core.room.walletSecret.WalletSecretDAO
@@ -29,7 +30,7 @@ import java.math.BigInteger
  * Happy coding ^_^
  */
 class BlockChainServiceImpl(var address: String?,
-                            var dao: WalletSecretDAO?,
+                            var coreFunctions: CoreFunctions?,
                             var habak: Habak?,
                             var web3j: Web3j?) : BlockChainService {
 
@@ -45,7 +46,7 @@ class BlockChainServiceImpl(var address: String?,
                     emitter.onError(InvalidAddressException())
                     return@create
                 }
-                val wallet = dao?.getWallet(address!!)?.blockingGet()
+                val wallet = coreFunctions?.getWalletByAddress(address!!)?.blockingGet()
                 if(wallet == null){
                     emitter.onError(WalletNotFoundException())
                     return@create
@@ -75,7 +76,7 @@ class BlockChainServiceImpl(var address: String?,
                     emitter.onError(InvalidAddressException())
                     return@create
                 }
-                val wallet = dao?.getWallet(address!!)?.blockingGet()
+                val wallet =  coreFunctions?.getWalletByAddress(address!!)?.blockingGet()
                 if(wallet == null){
                     emitter.onError(WalletNotFoundException())
                     return@create
@@ -112,7 +113,7 @@ class BlockChainServiceImpl(var address: String?,
                     emitter.onError(InvalidAddressException())
                     return@create
                 }
-                val wallet = dao?.getWallet(address!!)?.blockingGet()
+                val wallet =  coreFunctions?.getWalletByAddress(address!!)?.blockingGet()
                 if(wallet == null){
                     emitter.onError(WalletNotFoundException())
                     return@create
@@ -179,7 +180,7 @@ class BlockChainServiceImpl(var address: String?,
                 callback?.onTransactionError(InvalidAddressException())
                 return
             }
-            val wallet = dao?.getWallet(address!!)?.blockingGet()
+            val wallet =  coreFunctions?.getWalletByAddress(address!!)?.blockingGet()
             if(wallet == null){
                 callback?.onTransactionError(WalletNotFoundException())
                 return

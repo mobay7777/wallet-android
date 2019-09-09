@@ -1,10 +1,11 @@
 package com.tomochain.wallet.core.components
 
 import android.provider.Settings
-import android.support.test.InstrumentationRegistry
-import android.support.test.rule.GrantPermissionRule
-import android.support.test.runner.AndroidJUnit4
+
 import android.util.Log
+import androidx.test.InstrumentationRegistry
+import androidx.test.rule.GrantPermissionRule
+import androidx.test.runner.AndroidJUnit4
 
 import com.tomochain.wallet.core.common.exception.InvalidMnemonicException
 import com.tomochain.wallet.core.common.exception.InvalidPrivateKeyException
@@ -42,7 +43,7 @@ internal class WalletCoreTest {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         WalletCore.setup(WeakReference(context), object : CoreConfig(){
             override fun chain(): Chain {
-                return CommonChain.TOMO_CHAIN
+                return CommonChain.TOMO_CHAIN_TEST_NET
             }
 
             override fun habakAlias(): String {
@@ -62,9 +63,125 @@ internal class WalletCoreTest {
 
     @Test
     fun testToken(){
+
+
+        WalletCore.getInstance()
+            ?.trc21TokenService
+            ?.getTOMOZContractList()
+            ?.subscribe(
+                {
+                    Log.d(LOG, "getTokensList > onSuccess: ${it.size}")
+                    /*it.forEach {address ->
+                        Log.d(LOG, "getTokensList > onSuccess: $address")
+                    }*/
+                },{
+                    Log.e(LOG, "getTokensList > error: $it")
+                }
+            )
+
+
+        WalletCore.getInstance()
+            ?.tokenService
+            ?.getTokenInfo("0x095d85e62cb6ad354ff900c1d530a7c4b8e247b5")
+            ?.subscribe(
+                {
+                    Log.d(LOG, "getTokenInfo > onSuccess: $it")
+                },{
+                    Log.e(LOG, "getTokenInfo > error: $it")
+                }
+            )
+
+        WalletCore.getInstance()
+            ?.trc21TokenService
+            ?.isTRC21Token("0xc9cbc5e28b6b634831a23eed9a6a0fe6caaacb4b")
+            ?.subscribe(
+                {
+                    Log.d(LOG, "getTokenInfo > onSuccess: $it")
+                },{
+                    Log.e(LOG, "getTokenInfo > error: $it")
+                }
+            )
+
+
+        /*WalletCore.getInstance()
+            ?.coreFunctions
+            ?.createWalletFromPrivateKey("d7dbceae0451d6fbe1e81e44d016cea7b27640aa75cf8cdf4f8a22fb1cf9f4a5")?.subscribe(
+            {
+                Log.d(LOG, "success: $it")
+            },{
+                Log.e(LOG, "fail: " + it.localizedMessage)
+            }
+            )*/
+        /*WalletCore.getInstance("0xb085ab4dbbb3bcac94f871bc354ad32190e858dd")
+            ?.trc21TokenService
+            ?.getBalance("0xb38c1b54de4068d3c9c87ed447fdfa500954802b")
+            ?.subscribe(
+                {
+                    Log.d(LOG, "getBalance > onSuccess: $it")
+                },{
+                    Log.e(LOG, "getBalance > error: $it")
+                }
+            )
+
+        WalletCore.getInstance("0xb085ab4dbbb3bcac94f871bc354ad32190e858dd")
+            ?.trc21TokenService
+            ?.getTokenTransferFee("0xb38c1b54de4068d3c9c87ed447fdfa500954802b")
+            ?.subscribe(
+                {
+                    Log.d(LOG, "getTokenTransferFee > onSuccess: $it")
+                },{
+                    Log.e(LOG, "getTokenTransferFee > error: $it")
+                }
+            )
+
+        WalletCore.getInstance("0xb085ab4dbbb3bcac94f871bc354ad32190e858dd")
+            ?.trc21TokenService
+            ?.getTOMOZContractList()
+            ?.subscribe(
+                {
+                    Log.d(LOG, "getTokensList > onSuccess: ${it.size}")
+                    it.forEach {address ->
+                        Log.d(LOG, "getTokensList > onSuccess: $address")
+                    }
+                },{
+                    Log.e(LOG, "getTokensList > error: $it")
+                }
+            )
+
+
         val token = WalletCore.getInstance("0x06605b28aab9835be75ca242a8ae58f2e15f2f45")
             ?.trc20TokenService
+        token?.getTokenInfo("0x30c83c01836efb367fad1c03247327988c35aeaf")
+            ?.subscribe(
+                {
+                    Log.d(LOG, "getTokenInfo > onSuccess: $it")
+                },{
+                    Log.e(LOG, "getTokenInfo > error: $it")
+                }
+            )
+*/
+        /*WalletCore.getInstance("0xb085ab4dbbb3bcac94f871bc354ad32190e858dd")
+            ?.trc21TokenService
+            ?.transferToken("0xb38c1b54de4068d3c9c87ed447fdfa500954802b",
+                "0x6e7312d1028b70771bb9cdd9837442230a9349ca",
+                BigInteger("1").multiply(BigInteger.TEN.pow(18)), callback = object : TransactionListener{
+                    override fun onTransactionCreated(txId: String) {
+                        Log.d(LOG,"transferToken > onTransactionCreated: $txId")
+                    }
 
+                    override fun onTransactionComplete(txId: String, status: String) {
+                        Log.d(LOG,"transferToken > onTransactionComplete: $txId $status")
+                    }
+
+                    override fun onTransactionError(e: Exception) {
+                        Log.d(LOG,"transferToken > onTransactionError: ${e.localizedMessage}")
+                    }
+                })*/
+
+
+        /*
+        val token = WalletCore.getInstance("0x06605b28aab9835be75ca242a8ae58f2e15f2f45")
+            ?.trc20TokenService
         token?.getTokenInfo("0x30c83c01836efb367fad1c03247327988c35aeaf")
             ?.subscribe(
                 {
@@ -110,7 +227,7 @@ internal class WalletCoreTest {
         )
 
 
-        token?.estimateTokenTransferGas("0x3d05de67538b3dafc757f970424eabce6b061bc2",
+        token?.estimateTokenTransferGasLimit("0x3d05de67538b3dafc757f970424eabce6b061bc2",
             "0x6e7312d1028b70771bb9cdd9837442230a9349ca",
             BigInteger("1").multiply(BigInteger.TEN.pow(18)))
             ?.subscribe(
@@ -119,7 +236,7 @@ internal class WalletCoreTest {
                 },{
                     Log.e(LOG, "estimateTokenTransferGas > error: $it")
                 }
-            )
+            )*/
     }
 
 
@@ -152,7 +269,7 @@ internal class WalletCoreTest {
             }
         )
 
-        service?.createWalletFromPrivateKey("fe514e9fa6e6f96e63640e80ba413ba0994bac81357fd7bab18b1302bf347750")?.subscribe(
+        service?.createWalletFromPrivateKey("d7dbceae0451d6fbe1e81e44d016cea7b27640aa75cf8cdf4f8a22fb1cf9f4a5")?.subscribe(
             {
                 Log.d(LOG, "success: $it")
             },{

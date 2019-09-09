@@ -4,6 +4,7 @@ import android.util.Log
 import com.tomochain.wallet.core.common.LogTag.TAG_W3JL
 import com.tomochain.wallet.core.common.exception.InvalidPrivateKeyException
 import com.tomochain.wallet.core.common.exception.WalletNotFoundException
+import com.tomochain.wallet.core.components.CoreFunctions
 import com.tomochain.wallet.core.habak.EncryptedModel
 import com.tomochain.wallet.core.habak.cryptography.Habak
 import com.tomochain.wallet.core.room.walletSecret.WalletSecretDAO
@@ -26,7 +27,7 @@ import java.nio.charset.Charset
  * Happy coding ^_^
  */
 class SignerServiceImpl(var address: String?,
-                        var dao: WalletSecretDAO?,
+                        var coreFunctions: CoreFunctions?,
                         var habak: Habak?,
                         var web3j: Web3j?) : SignerService {
     override fun setWalletAddress(address: String?) {
@@ -34,7 +35,7 @@ class SignerServiceImpl(var address: String?,
     }
 
     override fun signRawMessage(message: String?): Single<SignResult>? {
-        return dao?.getWallet(address!!)
+        return coreFunctions?.getWalletByAddress(address!!)
             ?.flatMap {wallet ->
                 Single.create<SignResult> {
                     try{
@@ -104,7 +105,7 @@ class SignerServiceImpl(var address: String?,
     }
 
     override fun signPersonalMessage(message: String?): Single<SignResult>? {
-        return dao?.getWallet(address!!)
+        return coreFunctions?.getWalletByAddress(address!!)
             ?.flatMap {wallet ->
                 Single.create<SignResult> {
                     try{
@@ -176,7 +177,7 @@ class SignerServiceImpl(var address: String?,
         gasLimit: BigInteger?,
         payload: String?
     ): Single<SignResult>? {
-        return dao?.getWallet(address!!)
+        return coreFunctions?.getWalletByAddress(address!!)
             ?.flatMap {wallet ->
                 Single.create<SignResult> {
                     try{

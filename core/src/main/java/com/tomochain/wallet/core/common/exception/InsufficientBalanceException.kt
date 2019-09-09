@@ -8,5 +8,4 @@ import java.lang.Exception
  * Ping me at nienbkict@gmail.com
  * Happy coding ^_^
  */
-class InsufficientBalanceException(s: String = "InsufficientBalanceException") : Exception(){
-}
+class InsufficientBalanceException(s: String = "InsufficientBalanceException") : Exception(s)

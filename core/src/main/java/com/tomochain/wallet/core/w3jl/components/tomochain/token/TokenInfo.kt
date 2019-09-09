@@ -1,5 +1,7 @@
 package com.tomochain.wallet.core.w3jl.components.tomochain.token
 
+import java.math.BigInteger
+
 /**
  * Created by cityme on 06,September,2019
  * Midsummer.
@@ -10,7 +12,8 @@ data class TokenInfo(
     var address: String,
     var name: String,
     var symbol: String,
-    var decimal: Int
+    var decimal: Int,
+    var totalSupply: BigInteger
 ){
     fun withAddress(address: String?) : TokenInfo{
         this.address = address ?: ""
@@ -29,6 +32,11 @@ data class TokenInfo(
 
     fun withDecimal(decimal: Int?) : TokenInfo{
         this.decimal = decimal ?: 0
+        return this
+    }
+
+    fun withTotalSupply(totalSupply: BigInteger?) : TokenInfo{
+        this.totalSupply = totalSupply ?: BigInteger.ZERO
         return this
     }
 }

@@ -118,8 +118,8 @@ class TRC21ServiceImpl(override var address: String?,
                             gasLimit
                         }
 
-                        val isTomoZApplied = isTomoZApplied(tokenAddress).blockingGet()
-                        if (isTomoZApplied){
+                        val isTOMOZApplied = isTOMOZApplied(tokenAddress).blockingGet()
+                        if (isTOMOZApplied){
                             val tokenFee = getTokenTransferFee(tokenAddress)
                                     .blockingGet()
                             if (tokenBalance < (amount + tokenFee)){
@@ -130,11 +130,12 @@ class TRC21ServiceImpl(override var address: String?,
                             }
                         }else{
                             val transactionFee = calculatedGasLimit.multiply(gasPrice)
+                            coreBlockChainService?.setWalletAddress(address)
                             val availableTOMO = coreBlockChainService
                                     ?.getAccountBalance()?.blockingGet() ?: BigInteger.ZERO
 
                             if (availableTOMO < transactionFee){
-                                callback?.onTransactionError(InsufficientBalanceException("Your Token Balance is not enough to pay the transaction fee"))
+                                callback?.onTransactionError(InsufficientBalanceException("This transaction require $transactionFee wei as fee. Your balance is $availableTOMO wei"))
                                 return@subscribe
                             }
                         }
@@ -181,7 +182,7 @@ class TRC21ServiceImpl(override var address: String?,
 
                 }))
         return Single.create{ emitter ->
-            val responseValue = callSmartContractFunction(function, tokenAddress, address!!)
+            val responseValue = callSmartContractFunction(function, tokenAddress, address ?: Config.Address.DEFAULT)
             val response = FunctionReturnDecoder.decode(
                     responseValue, function.outputParameters)
             if (response.size == 1) {
@@ -193,7 +194,7 @@ class TRC21ServiceImpl(override var address: String?,
     }
 
 
-    override fun isTomoZApplied(tokenAddress: String): Single<Boolean> {
+    override fun isTOMOZApplied(tokenAddress: String): Single<Boolean> {
         val function = Function(
                 "getTokenCapacity",
                 listOf(Address(tokenAddress)),
@@ -202,11 +203,58 @@ class TRC21ServiceImpl(override var address: String?,
                 }))
         return Single.create{ emitter ->
             val responseValue =
-                    callSmartContractFunction(function, tRC21IssuerContractAddress, address!!)
+                    callSmartContractFunction(function, tRC21IssuerContractAddress, address ?: Config.Address.DEFAULT)
             val response = FunctionReturnDecoder.decode(
                     responseValue, function.outputParameters)
             if (response.size == 1) {
                 emitter.onSuccess((response[0] as Uint256).value != BigInteger.ZERO)
+            } else {
+                emitter.onError(NullPointerException())
+            }
+        }
+    }
+
+
+    override fun isTRC21Token(tokenAddress: String): Single<Boolean> {
+        val function = Function(
+            "issuer",
+            listOf(),
+            listOf(object : TypeReference<Address>() {
+
+            }))
+        return Single.create{ emitter ->
+            val responseValue =
+                callSmartContractFunction(function, tokenAddress, address ?: Config.Address.DEFAULT)
+            val response = FunctionReturnDecoder.decode(
+                responseValue, function.outputParameters)
+            if (response.size == 1) {
+                emitter.onSuccess(WalletUtil.isValidAddress((response[0] as Address).value))
+            } else {
+                emitter.onSuccess(false)
+            }
+        }
+    }
+
+    override fun getTOMOZContractList(): Single<List<String>> {
+        val function = Function(
+            "tokens",
+            arrayListOf(),
+            listOf(object : TypeReference<DynamicArray<Address>>() {
+
+            }))
+        return Single.create{ emitter ->
+            val responseValue =
+                callSmartContractFunction(function, tRC21IssuerContractAddress, address ?: Config.Address.DEFAULT)
+            val response = FunctionReturnDecoder.decode(
+                responseValue, function.outputParameters)
+            if (response.size == 1) {
+                val list : MutableList<String> = arrayListOf()
+
+                val r = (response[0] as DynamicArray<Address>).value
+                r.forEach { address ->
+                    list.add(address.value)
+                }
+                emitter.onSuccess( list)
             } else {
                 emitter.onError(NullPointerException())
             }

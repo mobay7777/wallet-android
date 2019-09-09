@@ -26,6 +26,14 @@ class Config {
     }
 
 
+    class Address{
+        companion object{
+            const val DEFAULT = "0x0000000000000000000000000000000000000000"
+            const val SAMPLE = "0x73507e8661778e4ea7df3dcb8a594A804411927E"
+        }
+    }
+
+
     class HDPath {
         companion object {
             const val TOMO = "m/44'/889'/0'/0/0"

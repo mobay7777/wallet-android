@@ -21,8 +21,7 @@ interface TokenService : BaseService {
     fun getName(tokenAddress: String?) : Single<String>
     fun getSymbol(tokenAddress: String?) : Single<String>
     fun getDecimal(tokenAddress: String?) : Single<Int>
+    fun getTotalSupply(tokenAddress: String?) : Single<BigInteger>
     fun getTokenInfo(tokenAddress: String?) : Single<TokenInfo?>
-
-
 
 }

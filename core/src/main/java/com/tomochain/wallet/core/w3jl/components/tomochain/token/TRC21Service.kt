@@ -21,6 +21,9 @@ interface TRC21Service : TokenService {
             gasPrice: BigInteger? = BigInteger(Config.Transaction.DEFAULT_GAS_PRICE),
             gasLimit: BigInteger? = null
     )
+
+    fun isTRC21Token(tokenAddress: String) : Single<Boolean>
     fun getTokenTransferFee(tokenAddress: String): Single<BigInteger>
-    fun isTomoZApplied(tokenAddress: String) : Single<Boolean>
+    fun isTOMOZApplied(tokenAddress: String) : Single<Boolean>
+    fun getTOMOZContractList() : Single<List<String>>
 }

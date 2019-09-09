@@ -77,7 +77,7 @@ class TRC20ServiceImpl( override var address: String?,
 
                     val tokenBalance = getBalance(tokenAddress).blockingGet()
                     if (tokenBalance < amount){
-                        callback?.onTransactionError(InsufficientBalanceException())
+                        callback?.onTransactionError(InsufficientBalanceException("Your Token balance is not enough to perform transaction"))
                         return@subscribe
                     }
 
@@ -106,6 +106,7 @@ class TRC20ServiceImpl( override var address: String?,
 
 
                     val transactionFee = calculatedGasLimit.multiply(gasPrice)
+                    coreBlockChainService?.setWalletAddress(address)
                     val availableTOMO = coreBlockChainService
                             ?.getAccountBalance()?.blockingGet() ?: BigInteger.ZERO
 
@@ -115,8 +116,6 @@ class TRC20ServiceImpl( override var address: String?,
                         return@subscribe
                     }
 
-
-                    Log.d(LogTag.TAG_W3JL, "calculatedGasLimit: $calculatedGasLimit")
                     val rawTransaction = RawTransaction
                         .createTransaction(nonce,gasPrice, calculatedGasLimit,
                             tokenAddress, encodedFunction)
@@ -156,6 +155,10 @@ class TRC20ServiceImpl( override var address: String?,
                                           amount: BigInteger): Single<BigInteger> {
         return Single.create { emitter ->
             try {
+
+                if (!WalletUtil.isValidAddress(address) || !WalletUtil.isValidAddress(tokenAddress) ){
+                    emitter.onError(InvalidAddressException())
+                }
                 val function = Function(
                     "transfer",
                     listOf(
@@ -182,10 +185,10 @@ class TRC20ServiceImpl( override var address: String?,
                     try {
                         emitter.onSuccess(BigInteger(Numeric.cleanHexPrefix(response.result),16))
                     }catch (e: Exception){
-                        emitter.onSuccess(BigInteger.valueOf(21000))
+                        emitter.onSuccess(BigInteger(Config.Transaction.DEFAULT_GAS_LIMIT))
                     }
                 }else{
-                    emitter.onSuccess(BigInteger.valueOf(21000))
+                    emitter.onSuccess(BigInteger(Config.Transaction.DEFAULT_GAS_LIMIT))
                 }
             } catch (e: Exception) {
                 emitter.tryOnError(e)
@@ -193,7 +196,5 @@ class TRC20ServiceImpl( override var address: String?,
         }
     }
 
-    override fun test(): String {
-        return "test"
-    }
+
 }

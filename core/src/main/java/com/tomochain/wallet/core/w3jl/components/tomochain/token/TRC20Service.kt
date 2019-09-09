@@ -25,6 +25,4 @@ interface TRC20Service : TokenService{
     fun estimateTokenTransferGasLimit(tokenAddress: String,
                                  recipient: String,
                                  amount: BigInteger): Single<BigInteger>
-
-    fun test() : String
 }

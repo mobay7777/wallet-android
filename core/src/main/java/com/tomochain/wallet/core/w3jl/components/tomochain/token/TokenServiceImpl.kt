@@ -1,5 +1,6 @@
 package com.tomochain.wallet.core.w3jl.components.tomochain.token
 
+import com.tomochain.wallet.core.common.Config
 import com.tomochain.wallet.core.common.exception.InvalidAddressException
 import com.tomochain.wallet.core.w3jl.config.chain.Chain
 import com.tomochain.wallet.core.w3jl.utils.WalletUtil
@@ -68,7 +69,7 @@ open class TokenServiceImpl(open var address: String?,
     override fun getName(tokenAddress: String?): Single<String> {
         return Single.create{ emitter ->
             try{
-                if (!WalletUtil.isValidAddress(address) || !WalletUtil.isValidAddress(tokenAddress)){
+                if ( !WalletUtil.isValidAddress(tokenAddress)){
                     emitter.onError(InvalidAddressException())
                     return@create
                 }
@@ -78,7 +79,7 @@ open class TokenServiceImpl(open var address: String?,
                     listOf(object : TypeReference<Utf8String>() {
 
                     }))
-                val responseValue = callSmartContractFunction(function, tokenAddress!!, address!!)
+                val responseValue = callSmartContractFunction(function, tokenAddress!!, address?: Config.Address.DEFAULT)
                 val response = FunctionReturnDecoder.decode(
                     responseValue, function.outputParameters)
                 if (response.size == 1) {
@@ -95,7 +96,7 @@ open class TokenServiceImpl(open var address: String?,
     override fun getSymbol(tokenAddress: String?): Single<String> {
         return Single.create{ emitter ->
             try{
-                if (!WalletUtil.isValidAddress(address) || !WalletUtil.isValidAddress(tokenAddress)){
+                if (!WalletUtil.isValidAddress(tokenAddress)){
                     emitter.onError(InvalidAddressException())
                     return@create
                 }
@@ -105,7 +106,7 @@ open class TokenServiceImpl(open var address: String?,
                     listOf(object : TypeReference<Utf8String>() {
 
                     }))
-                val responseValue = callSmartContractFunction(function, tokenAddress!!, address!!)
+                val responseValue = callSmartContractFunction(function, tokenAddress!!, address?: Config.Address.DEFAULT)
                 val response = FunctionReturnDecoder.decode(
                     responseValue, function.outputParameters)
                 if (response.size == 1) {
@@ -122,7 +123,7 @@ open class TokenServiceImpl(open var address: String?,
     override fun getDecimal(tokenAddress: String?): Single<Int> {
         return Single.create{ emitter ->
             try{
-                if (!WalletUtil.isValidAddress(address) || !WalletUtil.isValidAddress(tokenAddress)){
+                if ( !WalletUtil.isValidAddress(tokenAddress)){
                     emitter.onError(InvalidAddressException())
                     return@create
                 }
@@ -132,7 +133,7 @@ open class TokenServiceImpl(open var address: String?,
                     listOf(object : TypeReference<Uint8>() {
 
                     }))
-                val responseValue = callSmartContractFunction(function, tokenAddress!!, address!!)
+                val responseValue = callSmartContractFunction(function, tokenAddress!!, address?: Config.Address.DEFAULT)
                 val response = FunctionReturnDecoder.decode(
                     responseValue, function.outputParameters)
                 if (response.size == 1) {
@@ -147,10 +148,39 @@ open class TokenServiceImpl(open var address: String?,
     }
 
 
+    override fun getTotalSupply(tokenAddress: String?): Single<BigInteger> {
+        return Single.create{ emitter ->
+            try{
+                if (!WalletUtil.isValidAddress(tokenAddress)){
+                    emitter.onError(InvalidAddressException())
+                    return@create
+                }
+                val function = Function(
+                    "totalSupply",
+                    emptyList(),
+                    listOf(object : TypeReference<Uint256>() {
+
+                    }))
+                val responseValue = callSmartContractFunction(function, tokenAddress!!, address?: Config.Address.DEFAULT)
+                val response = FunctionReturnDecoder.decode(
+                    responseValue, function.outputParameters)
+                if (response.size == 1) {
+                    emitter.onSuccess((response[0] as Uint256).value)
+                } else {
+                    emitter.onError(NullPointerException())
+                }
+            }catch(t: Throwable){
+                emitter.onError(t)
+            }
+        }
+    }
+
+
     override fun getTokenInfo(tokenAddress: String?): Single<TokenInfo?> {
-        return getNameWithTokenInfo(tokenAddress, TokenInfo(tokenAddress!!,"","",0))
+        return getNameWithTokenInfo(tokenAddress, TokenInfo(tokenAddress!!,"","",0, BigInteger.ZERO))
             .flatMap { t -> getSymbolWithTokenInfo(tokenAddress,t) }
             .flatMap { t -> getDecimalWithTokenInfo(tokenAddress,t) }
+            .flatMap { t -> getTotalSupplyWithTokenInfo(tokenAddress, t) }
     }
 
     override fun setWalletAddress(address: String?) {
@@ -173,9 +203,10 @@ open class TokenServiceImpl(open var address: String?,
             .map { tokenInfo.withDecimal(it) }
     }
 
-
-
-
+    private fun getTotalSupplyWithTokenInfo(tokenAddress: String?, tokenInfo: TokenInfo) : Single<TokenInfo>{
+        return getTotalSupply(tokenAddress)
+            .map { tokenInfo.withTotalSupply(it) }
+    }
 
 
     protected fun callSmartContractFunction(function: Function, contractAddress: String, address: String): String? {

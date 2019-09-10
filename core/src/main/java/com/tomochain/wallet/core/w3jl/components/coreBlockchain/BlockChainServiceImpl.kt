@@ -243,6 +243,35 @@ class BlockChainServiceImpl(var address: String?,
         }
     }
 
+
+    @SuppressLint("CheckResult")
+    override fun sendSignedTransaction(signedTransaction: String?, callback: TransactionListener?) {
+        try{
+            web3j?.ethSendRawTransaction(signedTransaction)?.flowable()?.subscribe({transaction ->
+                callback?.onTransactionCreated(transaction.transactionHash)
+                web3j?.ethGetTransactionReceipt(transaction.transactionHash)
+                    ?.flowable()
+                    ?.toObservable()
+                    ?.repeat()
+                    ?.map { r ->
+                        r.result.status
+                    }
+                    ?.takeUntil {
+                        it.contains("0x", true)
+                    }
+                    ?.retry()
+                    ?.subscribe {
+                        callback?.onTransactionComplete(transaction.transactionHash, it)
+                    }
+            }, {
+                callback?.onTransactionError(it as Exception)
+            })
+
+        }catch(t: Throwable){
+            callback?.onTransactionError(t as Exception)
+        }
+    }
+
     override fun getTransactionStatus(txId: String?): Observable<String>? {
         return web3j?.ethGetTransactionReceipt(txId)
             ?.flowable()

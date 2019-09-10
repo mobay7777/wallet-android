@@ -39,5 +39,7 @@ interface BlockChainService : BaseService {
         callback: TransactionListener?
     )
 
+    fun sendSignedTransaction(signedTransaction: String?, callback: TransactionListener?)
+
     fun getTransactionStatus(txId: String?): Observable<String>?
 }

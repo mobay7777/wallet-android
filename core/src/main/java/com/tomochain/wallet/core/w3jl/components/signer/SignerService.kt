@@ -1,6 +1,7 @@
 package com.tomochain.wallet.core.w3jl.components.signer
 
 import com.tomochain.wallet.core.common.BaseService
+import com.tomochain.wallet.core.common.Config
 import io.reactivex.Single
 import java.math.BigInteger
 
@@ -19,7 +20,7 @@ interface SignerService : BaseService {
     fun signTransaction(
         recipient: String,
         amount: BigInteger?,
-        gasPrice: BigInteger?,
-        gasLimit: BigInteger?,
+        gasPrice: BigInteger? = BigInteger(Config.Transaction.DEFAULT_GAS_PRICE),
+        gasLimit: BigInteger? = BigInteger(Config.Transaction.DEFAULT_GAS_LIMIT),
         payload: String?) : Single<SignResult>?
 }

@@ -49,7 +49,7 @@ class Habak19Cipher(private var alias : String, var context: Context) : Habak {
 
     override fun decrypt(data: EncryptedModel): StringBuilder {
         return try {
-            StringBuilder(encryptionManager.decrypt(String(data.data!!))!!)
+            StringBuilder(encryptionManager.decrypt(String(data.getEncryptedData().first!!))!!)
         } catch (e: Exception) {
             StringBuilder()
         }

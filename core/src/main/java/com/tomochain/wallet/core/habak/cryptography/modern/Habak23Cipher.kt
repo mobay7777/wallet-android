@@ -97,14 +97,14 @@ class Habak23Cipher(var alias : String) : Habak {
     override fun decrypt(data: EncryptedModel): StringBuilder {
         return try {
             val cipher = Cipher.getInstance(Constant.AES_MODE_FROM_M)
-            val spec = GCMParameterSpec(128, data.iv)
+            val spec = GCMParameterSpec(128, data.getEncryptedData().second)
             cipher.init(Cipher.DECRYPT_MODE, getSecretKey(), spec)
             /*val r = String(cipher.doFinal(data.data), Charsets.UTF_8)
             return r*/
 
             val charset = Charset.forName("UTF-8")
             val decoder = charset.newDecoder()
-            val srcBuffer = ByteBuffer.wrap(cipher.doFinal(data.data))
+            val srcBuffer = ByteBuffer.wrap(cipher.doFinal(data.getEncryptedData().first))
 
 
             val sb = StringBuilder(decoder.decode(srcBuffer))

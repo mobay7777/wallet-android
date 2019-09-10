@@ -92,9 +92,18 @@ class CoreModule(var context: WeakReference<Context>,
     @Provides
     fun getTRC21Service() : TRC21Service {
         return TRC21ServiceImpl(null,
-                getWeb3JService(),
-                config.chain(),
-                getCoreFunctions(),
-                getHaBak(),getCoreBlockChainService())
+            getWeb3JService(),
+            config.chain(),
+            getCoreFunctions(),
+            getHaBak(),getCoreBlockChainService())
+    }
+
+
+    @Provides
+    fun getTokenManager() : TokenManager {
+        return TokenManager(
+            TokenServiceImpl(null, getWeb3JService(), config.chain()),
+            getTRC20Service(), getTRC21Service()
+        )
     }
 }

@@ -40,8 +40,8 @@ data class EntityWalletSecret(
         return "EntityWalletSecret(address='$address', " +
                 "createdAt=$createdAt, " +
                 "createdFrom=$createdFrom, " +
-                "encryptedSeed='${encryptedSeed}', " +
-                "encryptedPKey='${encryptedPKey}', " +
+                "encryptedSeed='${encryptedSeed.length}', " +
+                "encryptedPKey='${encryptedPKey.length}', " +
                 "dbVersion=$dbVersion, metadata='$metadata')"
     }
 

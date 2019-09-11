@@ -39,10 +39,10 @@ import java.math.BigInteger
  * Happy coding ^_^
  */
 class TRC20ServiceImpl( override var address: String?,
-                        override var web3j: Web3j?,
-                        override var chain: Chain?,
-                        private var walletSecretDataService: WalletSecretDataService?,
-                        private var coreBlockChainService: BlockChainService?) : TokenServiceImpl(address, web3j, chain), TRC20Service {
+                        override val web3j: Web3j?,
+                        override val chain: Chain?,
+                        private val walletSecretDataService: WalletSecretDataService?,
+                        private val coreBlockChainService: BlockChainService?) : TokenServiceImpl(address, web3j, chain), TRC20Service {
 
     @SuppressLint("CheckResult")
     override fun transferToken(

@@ -15,8 +15,8 @@ import java.lang.NullPointerException
  * Ping me at nienbkict@gmail.com
  * Happy coding ^_^
  */
-class WalletSecretDataImpl(var habak: Habak?,
-                           var dao: DatabaseWalletSecret?) : WalletSecretDataService{
+class WalletSecretDataImpl(private val  habak: Habak?,
+                           private val  dao: DatabaseWalletSecret?) : WalletSecretDataService{
 
 
     override fun getPrivateKey(walletAddress: String?): Single<StringBuilder> {
@@ -69,7 +69,7 @@ class WalletSecretDataImpl(var habak: Habak?,
                             emitter.onSuccess(habak?.decrypt(e) ?: StringBuilder(""))
                         }
 
-                    },{ 
+                    },{
                         emitter.onSuccess(StringBuilder(""))
                     }
                 )

@@ -28,7 +28,7 @@ import kotlin.collections.ArrayList
  * Ping me at nienbkict@gmail.com
  * Happy coding ^_^
  */
-class Habak19Cipher(private var alias : String, var context: Context) : Habak {
+class Habak19Cipher(private val alias : String, private val context: Context) : Habak {
     private lateinit var encryptionManager: EncryptionManager
     override fun initialize() {
         val preference = context.getSharedPreferences(alias, Context.MODE_PRIVATE)

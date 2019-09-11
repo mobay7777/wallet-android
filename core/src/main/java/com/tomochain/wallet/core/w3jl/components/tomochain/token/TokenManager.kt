@@ -24,9 +24,9 @@ import java.time.temporal.TemporalAmount
  * Ping me at nienbkict@gmail.com
  * Happy coding ^_^
  */
-class TokenManager(private var tokenService: TokenService?,
-                   private var tRC20Service: TRC20Service?,
-                   private var tRC21Service: TRC21Service?){
+class TokenManager(private val tokenService: TokenService?,
+                   private val tRC20Service: TRC20Service?,
+                   private val tRC21Service: TRC21Service?){
 
     enum class UnitType{
         TOMO_AT_WEI,

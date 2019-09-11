@@ -15,8 +15,8 @@ import io.reactivex.Single
  * Ping me at nienbkict@gmail.com
  * Happy coding ^_^
  */
-class CoreFunctionsImpl(var dao: DatabaseWalletSecret?,
-                        var walletService: WalletService?) : CoreFunctions{
+class CoreFunctionsImpl(private val dao: DatabaseWalletSecret?,
+                        private val walletService: WalletService?) : CoreFunctions{
 
 
     override fun createWalletFromMnemonics(mnemonics: String?, hdPath: String): Single<String> {

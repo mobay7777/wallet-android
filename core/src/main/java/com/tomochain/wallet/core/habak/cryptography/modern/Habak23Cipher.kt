@@ -23,7 +23,7 @@ import javax.crypto.spec.GCMParameterSpec
  * Ping me at nienbkict@gmail.com
  * Happy coding ^_^
  */
-class Habak23Cipher(var alias : String) : Habak {
+class Habak23Cipher(private val alias : String) : Habak {
 
     private lateinit var keyStore: KeyStore
 

@@ -27,8 +27,8 @@ import java.math.BigInteger
  * Happy coding ^_^
  */
 open class TokenServiceImpl(open var address: String?,
-                            open var web3j: Web3j?,
-                            open var chain: Chain?) : TokenService{
+                            open val web3j: Web3j?,
+                            open val chain: Chain?) : TokenService{
 
 
     override fun getBalance(tokenAddress: String?): Single<BigInteger> {

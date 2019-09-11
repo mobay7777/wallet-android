@@ -23,8 +23,8 @@ import java.nio.charset.Charset
  * Happy coding ^_^
  */
 class SignerServiceImpl(var address: String?,
-                        var walletSecretDataService: WalletSecretDataService?,
-                        var web3j: Web3j?) : SignerService {
+                        private val walletSecretDataService: WalletSecretDataService?,
+                        private val web3j: Web3j?) : SignerService {
     override fun setWalletAddress(address: String?) {
         this.address = address
     }

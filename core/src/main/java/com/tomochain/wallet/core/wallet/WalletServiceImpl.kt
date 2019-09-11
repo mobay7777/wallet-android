@@ -27,7 +27,7 @@ import java.util.*
  * Ping me at nienbkict@gmail.com
  * Happy coding ^_^
  */
-class WalletServiceImpl(var habak: Habak?) : WalletService {
+class WalletServiceImpl(private val habak: Habak?) : WalletService {
 
     override fun getWordList(): List<String> {
         return try{

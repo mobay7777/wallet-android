@@ -31,9 +31,9 @@ import java.math.BigInteger
  * Happy coding ^_^
  */
 class BlockChainServiceImpl(var address: String?,
-                            var coreFunctions: CoreFunctions?,
-                            var walletSecretDataService: WalletSecretDataService?,
-                            var web3j: Web3j?) : BlockChainService {
+                            private val coreFunctions: CoreFunctions?,
+                            private val walletSecretDataService: WalletSecretDataService?,
+                            private val web3j: Web3j?) : BlockChainService {
 
     override fun setWalletAddress(address: String?) {
         this.address = address

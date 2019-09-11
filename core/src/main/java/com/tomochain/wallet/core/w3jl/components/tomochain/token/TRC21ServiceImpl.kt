@@ -16,6 +16,7 @@ import com.tomochain.wallet.core.w3jl.config.chain.Chain
 import com.tomochain.wallet.core.w3jl.config.chain.CommonChain
 import com.tomochain.wallet.core.w3jl.listeners.TransactionListener
 import com.tomochain.wallet.core.w3jl.utils.WalletUtil
+import com.tomochain.wallet.core.wallet.WalletSecretDataService
 import io.reactivex.Single
 import org.web3j.abi.FunctionEncoder
 import org.web3j.abi.FunctionReturnDecoder
@@ -48,8 +49,7 @@ import java.util.concurrent.TimeUnit
 class TRC21ServiceImpl(override var address: String?,
                        override var web3j: Web3j?,
                        override var chain: Chain?,
-                       private var coreFunctions: CoreFunctions?,
-                       private var habak: Habak?,
+                       private var walletSecretDataService: WalletSecretDataService?,
                        private var coreBlockChainService: BlockChainService?) : TokenServiceImpl(address, web3j, chain), TRC21Service {
 
     private val tRC21IssuerContractAddress : String by lazy {
@@ -72,12 +72,8 @@ class TRC21ServiceImpl(override var address: String?,
                 callback?.onTransactionError(InvalidAddressException())
                 return
             }
-            coreFunctions?.getWalletByAddress(address!!)?.subscribe(
-                    { wallet ->
-                        if (!WalletUtil.isValidAddress(address) || !WalletUtil.isValidAddress(tokenAddress) ){
-                            callback?.onTransactionError(InvalidAddressException())
-                        }
-                        val pKey = habak?.decrypt(EncryptedModel.readFromString(wallet!!.encryptedPKey))
+            walletSecretDataService?.getPrivateKey(address!!)?.subscribe(
+                    { pKey ->
                         if ( !WalletUtil.isValidPrivateKey(pKey.toString())){
                             callback?.onTransactionError(InvalidPrivateKeyException())
                             pKey?.clear()

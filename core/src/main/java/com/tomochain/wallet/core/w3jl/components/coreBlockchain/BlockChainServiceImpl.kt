@@ -13,6 +13,7 @@ import com.tomochain.wallet.core.habak.cryptography.Habak
 import com.tomochain.wallet.core.room.walletSecret.WalletSecretDAO
 import com.tomochain.wallet.core.w3jl.listeners.TransactionListener
 import com.tomochain.wallet.core.w3jl.utils.WalletUtil
+import com.tomochain.wallet.core.wallet.WalletSecretDataService
 import io.reactivex.*
 import org.web3j.crypto.Credentials
 import org.web3j.crypto.RawTransaction
@@ -31,7 +32,7 @@ import java.math.BigInteger
  */
 class BlockChainServiceImpl(var address: String?,
                             var coreFunctions: CoreFunctions?,
-                            var habak: Habak?,
+                            var walletSecretDataService: WalletSecretDataService?,
                             var web3j: Web3j?) : BlockChainService {
 
     override fun setWalletAddress(address: String?) {
@@ -113,8 +114,8 @@ class BlockChainServiceImpl(var address: String?,
                     emitter.onError(InvalidAddressException())
                     return@create
                 }
-                val wallet =  coreFunctions?.getWalletByAddress(address!!)?.blockingGet()
-                if(wallet == null){
+                val pKey =  walletSecretDataService?.getPrivateKey(address!!)?.blockingGet()
+                if(pKey == null || pKey.isEmpty()){
                     emitter.onError(WalletNotFoundException())
                     return@create
                 }
@@ -123,9 +124,8 @@ class BlockChainServiceImpl(var address: String?,
                     emitter.onError(InsufficientBalanceException(""))
                     return@create
                 }
-                val pKey = habak?.decrypt(EncryptedModel.readFromString(wallet.encryptedPKey))
                 val credentials = Credentials.create(pKey?.toString())
-                pKey?.clear()
+                pKey.clear()
                 val realAmount = amount ?: BigInteger.ZERO
                 val from = credentials.address
                 val ethGetTransactionCount = web3j?.ethGetTransactionCount(
@@ -180,8 +180,8 @@ class BlockChainServiceImpl(var address: String?,
                 callback?.onTransactionError(InvalidAddressException())
                 return
             }
-            val wallet =  coreFunctions?.getWalletByAddress(address!!)?.blockingGet()
-            if(wallet == null){
+            val pKey = walletSecretDataService?.getPrivateKey(address!!)?.blockingGet()
+            if(pKey == null || pKey.isEmpty()){
                 callback?.onTransactionError(WalletNotFoundException())
                 return
             }
@@ -189,9 +189,9 @@ class BlockChainServiceImpl(var address: String?,
                 callback?.onTransactionError(InsufficientBalanceException(""))
                 return
             }
-            val pKey = habak?.decrypt(EncryptedModel.readFromString(wallet.encryptedPKey))
-            val credentials = Credentials.create(pKey?.toString())
-            pKey?.clear()
+
+            val credentials = Credentials.create(pKey.toString())
+            pKey.clear()
             val realAmount = amount ?: BigInteger.ZERO
             val from = credentials.address
             val ethGetTransactionCount = web3j?.ethGetTransactionCount(

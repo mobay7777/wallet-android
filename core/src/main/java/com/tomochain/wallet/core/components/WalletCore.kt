@@ -8,6 +8,7 @@ import com.tomochain.wallet.core.habak.cryptography.Habak
 import com.tomochain.wallet.core.w3jl.components.coreBlockchain.BlockChainService
 import com.tomochain.wallet.core.w3jl.components.signer.SignerService
 import com.tomochain.wallet.core.w3jl.components.tomochain.token.*
+import com.tomochain.wallet.core.wallet.WalletSecretDataService
 import com.tomochain.wallet.core.wallet.WalletService
 import java.lang.ref.WeakReference
 import javax.inject.Inject
@@ -41,6 +42,8 @@ class WalletCore {
     lateinit var coreFunctions : CoreFunctions
     @Inject
     lateinit var walletService: WalletService
+    @Inject
+    lateinit var walletSecretDataService: WalletSecretDataService
 
 
     companion object{

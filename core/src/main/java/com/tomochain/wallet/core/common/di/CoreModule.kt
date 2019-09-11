@@ -13,6 +13,8 @@ import com.tomochain.wallet.core.w3jl.components.coreBlockchain.BlockChainServic
 import com.tomochain.wallet.core.w3jl.components.signer.SignerService
 import com.tomochain.wallet.core.w3jl.components.signer.SignerServiceImpl
 import com.tomochain.wallet.core.w3jl.components.tomochain.token.*
+import com.tomochain.wallet.core.wallet.WalletSecretDataImpl
+import com.tomochain.wallet.core.wallet.WalletSecretDataService
 import com.tomochain.wallet.core.wallet.WalletService
 import com.tomochain.wallet.core.wallet.WalletServiceImpl
 import dagger.Module
@@ -40,6 +42,12 @@ class CoreModule(var context: WeakReference<Context>,
 
     @Singleton
     @Provides
+    fun getWalletSecretDataService() : WalletSecretDataService {
+        return WalletSecretDataImpl(getHaBak(), getDatabaseWallet())
+    }
+
+    @Singleton
+    @Provides
     fun getDatabaseWallet() : DatabaseWalletSecret {
         return DatabaseWalletSecret.getInstance(context.get()!!, config.roomHelperSalt())!!
     }
@@ -59,17 +67,17 @@ class CoreModule(var context: WeakReference<Context>,
 
     @Provides
     fun getCoreFunctions() : CoreFunctions {
-        return CoreFunctionsImpl(getHaBak(), getDatabaseWallet(), getWalletService())
+        return CoreFunctionsImpl( getDatabaseWallet(), getWalletService())
     }
 
     @Provides
     fun getSignerService() : SignerService {
-        return SignerServiceImpl(null, getCoreFunctions(), getHaBak(), getWeb3JService())
+        return SignerServiceImpl(null, getWalletSecretDataService(), getWeb3JService())
     }
 
     @Provides
     fun getCoreBlockChainService() : BlockChainService {
-        return BlockChainServiceImpl(null, getCoreFunctions(), getHaBak(), getWeb3JService())
+        return BlockChainServiceImpl(null, getCoreFunctions(), getWalletSecretDataService(), getWeb3JService())
     }
 
     @Provides
@@ -84,8 +92,8 @@ class CoreModule(var context: WeakReference<Context>,
         return TRC20ServiceImpl(null,
                 getWeb3JService(),
                 config.chain(),
-                getCoreFunctions(),
-                getHaBak(),getCoreBlockChainService())
+                getWalletSecretDataService(),
+            getCoreBlockChainService())
     }
 
 
@@ -94,8 +102,8 @@ class CoreModule(var context: WeakReference<Context>,
         return TRC21ServiceImpl(null,
             getWeb3JService(),
             config.chain(),
-            getCoreFunctions(),
-            getHaBak(),getCoreBlockChainService())
+            getWalletSecretDataService(),
+            getCoreBlockChainService())
     }
 
 

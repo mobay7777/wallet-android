@@ -3,12 +3,8 @@ package com.tomochain.wallet.core.w3jl.components.signer
 import android.util.Log
 import com.tomochain.wallet.core.common.LogTag.TAG_W3JL
 import com.tomochain.wallet.core.common.exception.InvalidPrivateKeyException
-import com.tomochain.wallet.core.common.exception.WalletNotFoundException
-import com.tomochain.wallet.core.components.CoreFunctions
-import com.tomochain.wallet.core.habak.EncryptedModel
-import com.tomochain.wallet.core.habak.cryptography.Habak
-import com.tomochain.wallet.core.room.walletSecret.WalletSecretDAO
 import com.tomochain.wallet.core.w3jl.utils.WalletUtil
+import com.tomochain.wallet.core.wallet.WalletSecretDataService
 import io.reactivex.Single
 import org.web3j.crypto.Credentials
 import org.web3j.crypto.RawTransaction
@@ -27,20 +23,17 @@ import java.nio.charset.Charset
  * Happy coding ^_^
  */
 class SignerServiceImpl(var address: String?,
-                        var coreFunctions: CoreFunctions?,
-                        var habak: Habak?,
+                        var walletSecretDataService: WalletSecretDataService?,
                         var web3j: Web3j?) : SignerService {
     override fun setWalletAddress(address: String?) {
         this.address = address
     }
 
     override fun signRawMessage(message: String?): Single<SignResult>? {
-        return coreFunctions?.getWalletByAddress(address!!)
-            ?.flatMap {wallet ->
+        return walletSecretDataService?.getPrivateKey(address!!)
+            ?.flatMap {pKey ->
                 Single.create<SignResult> {
                     try{
-                        val pKey = habak?.decrypt(EncryptedModel.readFromString(wallet.encryptedPKey))
-
                         if (!WalletUtil.isValidPrivateKey(pKey.toString())){
                             it.onSuccess(
                                 SignResult(
@@ -51,7 +44,7 @@ class SignerServiceImpl(var address: String?,
                                     InvalidPrivateKeyException()
                                 )
                             )
-                            pKey?.clear()
+                            pKey.clear()
                             return@create
                         }
                         if (message == null){
@@ -64,12 +57,12 @@ class SignerServiceImpl(var address: String?,
                                     Exception("Null or empty input")
                                 )
                             )
-                            pKey?.clear()
+                            pKey.clear()
                             return@create
                         }
 
                         val credential = Credentials.create(pKey.toString())
-                        pKey?.clear()
+                        pKey.clear()
                         val signature = Sign.signPrefixedMessage(message!!.toByteArray(Charset.defaultCharset()), credential.ecKeyPair)
                         val signed = Numeric.toHexString(signature.r) +
                                 Numeric.cleanHexPrefix(Numeric.toHexString(signature.s)) +
@@ -105,11 +98,10 @@ class SignerServiceImpl(var address: String?,
     }
 
     override fun signPersonalMessage(message: String?): Single<SignResult>? {
-        return coreFunctions?.getWalletByAddress(address!!)
-            ?.flatMap {wallet ->
+        return walletSecretDataService?.getPrivateKey(address!!)
+            ?.flatMap {pKey ->
                 Single.create<SignResult> {
                     try{
-                        val pKey = habak?.decrypt(EncryptedModel.readFromString(wallet.encryptedPKey))
 
                         if (!WalletUtil.isValidPrivateKey(pKey.toString())){
                             it.onSuccess(
@@ -121,7 +113,7 @@ class SignerServiceImpl(var address: String?,
                                     InvalidPrivateKeyException()
                                 )
                             )
-                            pKey?.clear()
+                            pKey.clear()
                             return@create
                         }
                         if (message == null){
@@ -134,12 +126,12 @@ class SignerServiceImpl(var address: String?,
                                     Exception("Null or empty input")
                                 )
                             )
-                            pKey?.clear()
+                            pKey.clear()
                             return@create
                         }
 
                         val credential = Credentials.create(pKey.toString())
-                        pKey?.clear()
+                        pKey.clear()
                         val signature = Sign.signPrefixedMessage(Numeric.hexStringToByteArray(message), credential.ecKeyPair)
                         val signed = Numeric.toHexString(signature.r) +
                                 Numeric.cleanHexPrefix(Numeric.toHexString(signature.s)) +
@@ -177,12 +169,10 @@ class SignerServiceImpl(var address: String?,
         gasLimit: BigInteger?,
         payload: String?
     ): Single<SignResult>? {
-        return coreFunctions?.getWalletByAddress(address!!)
-            ?.flatMap {wallet ->
+        return walletSecretDataService?.getPrivateKey(address!!)
+            ?.flatMap {pKey ->
                 Single.create<SignResult> {
                     try{
-                        val pKey = habak?.decrypt(EncryptedModel.readFromString(wallet.encryptedPKey))
-
                         if (!WalletUtil.isValidPrivateKey(pKey.toString())){
                             it.onSuccess(
                                 SignResult(
@@ -193,12 +183,12 @@ class SignerServiceImpl(var address: String?,
                                     InvalidPrivateKeyException()
                                 )
                             )
-                            pKey?.clear()
+                            pKey.clear()
                             return@create
                         }
 
                         val credential = Credentials.create(pKey.toString())
-                        pKey?.clear()
+                        pKey.clear()
 
                         val realAmount = amount ?: BigInteger.ZERO
                         val from = credential.address

@@ -36,6 +36,11 @@ data class EntityWalletSecret(
         metadata = ""
     }
 
+    fun clearSensitiveContent(){
+        encryptedSeed = ""
+        encryptedPKey = ""
+    }
+
     override fun toString(): String {
         return "EntityWalletSecret(address='$address', " +
                 "createdAt=$createdAt, " +

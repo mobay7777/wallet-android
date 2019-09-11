@@ -15,15 +15,14 @@ import io.reactivex.Single
  * Ping me at nienbkict@gmail.com
  * Happy coding ^_^
  */
-class CoreFunctionsImpl(var habak: Habak?,
-                        var dao: DatabaseWalletSecret?,
+class CoreFunctionsImpl(var dao: DatabaseWalletSecret?,
                         var walletService: WalletService?) : CoreFunctions{
 
 
     override fun createWalletFromMnemonics(mnemonics: String?, hdPath: String): Single<String> {
         return Single.create {emitter ->
             try{
-                if (habak == null || dao == null || walletService == null) {
+                if ( dao == null || walletService == null) {
                     emitter.onError(ServiceNotImplementException())
                     return@create
                 }
@@ -67,7 +66,7 @@ class CoreFunctionsImpl(var habak: Habak?,
     override fun createWalletFromPrivateKey(privateKey: String?): Single<String> {
         return Single.create {emitter ->
             try{
-                if (habak == null || dao == null || walletService == null) {
+                if ( dao == null || walletService == null) {
                     emitter.onError(ServiceNotImplementException())
                     return@create
                 }
@@ -111,7 +110,7 @@ class CoreFunctionsImpl(var habak: Habak?,
     override fun createWalletFromAddress(address: String?): Single<String> {
         return Single.create {emitter ->
             try{
-                if (habak == null || dao == null || walletService == null) {
+                if ( dao == null || walletService == null) {
                     emitter.onError(ServiceNotImplementException())
                     return@create
                 }
@@ -152,14 +151,19 @@ class CoreFunctionsImpl(var habak: Habak?,
     override fun getAllWallet(): Single<MutableList<EntityWalletSecret>> {
         return Single.create {emitter ->
             try{
-                if (habak == null || dao == null || walletService == null) {
+                if (dao == null || walletService == null) {
                     emitter.onError(ServiceNotImplementException())
                     return@create
                 }
 
                 dao!!.walletDAO().getAllWallet().subscribe(
                     { list ->
-                        emitter.onSuccess(list as MutableList<EntityWalletSecret>)
+                        val list1 : MutableList<EntityWalletSecret> = arrayListOf()
+                        list.forEach {wallet ->
+                            wallet.clearSensitiveContent()
+                            list1.add(wallet)
+                        }
+                        emitter.onSuccess(list1)
                     },{ t ->
                         emitter.onError(t)
                     }
@@ -173,7 +177,7 @@ class CoreFunctionsImpl(var habak: Habak?,
     override fun getWalletByAddress(address: String?): Single<EntityWalletSecret?> {
         return Single.create {emitter ->
             try{
-                if (habak == null || dao == null || walletService == null) {
+                if (dao == null || walletService == null) {
                     emitter.onError(ServiceNotImplementException())
                     return@create
                 }
@@ -183,6 +187,7 @@ class CoreFunctionsImpl(var habak: Habak?,
                 }
                 dao!!.walletDAO().getWallet(address!!).subscribe(
                     { wallet ->
+                        wallet?.clearContent()
                         emitter.onSuccess(wallet!!)
                     },{ t ->
                         emitter.onError(t)
@@ -197,7 +202,7 @@ class CoreFunctionsImpl(var habak: Habak?,
     override fun removeWallet(address: String?): Single<EntityWalletSecret?> {
         return Single.create {emitter ->
             try{
-                if (habak == null || dao == null || walletService == null) {
+                if (dao == null || walletService == null) {
                     emitter.onError(ServiceNotImplementException())
                     return@create
                 }

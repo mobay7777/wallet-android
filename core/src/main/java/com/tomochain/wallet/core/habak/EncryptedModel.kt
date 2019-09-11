@@ -54,8 +54,8 @@ class EncryptedModel(private var data: ByteArray? = null,
     }
 
     companion object {
-        fun readFromString(src : String) : EncryptedModel {
-            if (src.isEmpty()) return EncryptedModel()
+        fun readFromString(src : String) : EncryptedModel = try{
+            if (src.isEmpty()) EncryptedModel()
             val b1 = src.substring(src.length - 2)
             val b2= src.substring(0, src.length - 2)
             var r = ""
@@ -75,7 +75,9 @@ class EncryptedModel(private var data: ByteArray? = null,
             }
             val data = Base64.decode(r + b1, Base64.DEFAULT)
             val s = String(data, Charset.defaultCharset())
-            return Gson().fromJson(s, EncryptedModel::class.java)
+            Gson().fromJson(s, EncryptedModel::class.java)
+        }catch(t: Throwable){
+            EncryptedModel()
         }
     }
 

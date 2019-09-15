@@ -108,8 +108,8 @@ class CoreModule(var context: WeakReference<Context>,
 
 
     @Provides
-    fun getTokenManager() : TokenManager {
-        return TokenManager(
+    fun getTokenManager() : TokenManagerService {
+        return TokenManagerImpl(
             TokenServiceImpl(null, getWeb3JService(), config.chain()),
             getTRC20Service(), getTRC21Service()
         )

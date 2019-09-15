@@ -4,7 +4,6 @@ import android.content.Context
 import com.tomochain.wallet.core.common.di.CoreComponent
 import com.tomochain.wallet.core.common.di.CoreModule
 import com.tomochain.wallet.core.common.di.DaggerCoreComponent
-import com.tomochain.wallet.core.habak.cryptography.Habak
 import com.tomochain.wallet.core.w3jl.components.coreBlockchain.BlockChainService
 import com.tomochain.wallet.core.w3jl.components.signer.SignerService
 import com.tomochain.wallet.core.w3jl.components.tomochain.token.*
@@ -37,7 +36,7 @@ class WalletCore {
     @Inject
     lateinit var trc21TokenService: TRC21Service
     @Inject
-    lateinit var tokenManager: TokenManager
+    lateinit var tokenManager: TokenManagerService
     @Inject
     lateinit var coreFunctions : CoreFunctions
     @Inject

@@ -1,22 +1,13 @@
 package com.tomochain.wallet.core.w3jl.components.tomochain.token
 
 import android.annotation.SuppressLint
-import android.location.Address
-import com.tomochain.wallet.core.common.BaseService
 import com.tomochain.wallet.core.common.Config
 import com.tomochain.wallet.core.common.exception.InvalidAmountException
-import com.tomochain.wallet.core.components.CoreFunctions
-import com.tomochain.wallet.core.habak.cryptography.Habak
-import com.tomochain.wallet.core.w3jl.components.coreBlockchain.BlockChainService
-import com.tomochain.wallet.core.w3jl.config.chain.Chain
 import com.tomochain.wallet.core.w3jl.listeners.TransactionListener
 import com.tomochain.wallet.core.w3jl.utils.ConvertUtil
 import io.reactivex.Single
-import org.web3j.protocol.Web3j
-import org.web3j.protocol.core.methods.response.EthGasPrice
 import java.math.BigDecimal
 import java.math.BigInteger
-import java.time.temporal.TemporalAmount
 
 /**
  * Created by cityme on 10,September,2019
@@ -24,9 +15,9 @@ import java.time.temporal.TemporalAmount
  * Ping me at nienbkict@gmail.com
  * Happy coding ^_^
  */
-class TokenManager(private val tokenService: TokenService?,
-                   private val tRC20Service: TRC20Service?,
-                   private val tRC21Service: TRC21Service?){
+class TokenManagerImpl(private val tokenService: TokenService?,
+                       private val tRC20Service: TRC20Service?,
+                       private val tRC21Service: TRC21Service?) : TokenManagerService {
 
     enum class UnitType{
         TOMO_AT_WEI,
@@ -39,13 +30,13 @@ class TokenManager(private val tokenService: TokenService?,
     private var walletAddress: String? = null
     private var tokenAddress: String? = null
 
-    fun withTokenAddress(tokenAddress: String?) : TokenManager{
+    override fun withTokenAddress(tokenAddress: String?) : TokenManagerImpl{
         this.tokenAddress = tokenAddress
         this.tokenInfo = tokenService?.getTokenInfo(tokenAddress)?.blockingGet()
         return this
     }
 
-    fun withWalletAddress(walletAddress: String?) : TokenManager {
+    override fun withWalletAddress(walletAddress: String?) : TokenManagerImpl {
         this.walletAddress = walletAddress
         this.tokenService?.setWalletAddress(walletAddress)
         this.tRC20Service?.setWalletAddress(walletAddress)
@@ -53,7 +44,7 @@ class TokenManager(private val tokenService: TokenService?,
         return this
     }
 
-    private fun getToken() : TokenInfo{
+    override fun getToken() : TokenInfo{
         if (tokenInfo != null){
             tokenInfo = tokenService?.getTokenInfo(tokenAddress)?.blockingGet()
         }
@@ -63,11 +54,11 @@ class TokenManager(private val tokenService: TokenService?,
 
 
 
-    fun getTokenBalance() : Single<BigInteger>?{
+    override fun getTokenBalance() : Single<BigInteger>?{
         return tokenService?.getBalance(tokenAddress)
     }
 
-    fun getTokenFormattedBalance() : Single<BigDecimal>?{
+    override fun getTokenFormattedBalance() : Single<BigDecimal>?{
         return tokenService?.getBalance(tokenAddress)
             ?.map {
                 it.toBigDecimal().divide(BigDecimal.TEN.pow(getToken().decimal))
@@ -75,7 +66,7 @@ class TokenManager(private val tokenService: TokenService?,
     }
 
 
-    fun getTokenInfo() : Single<TokenInfo?>?{
+    override fun getTokenInfo() : Single<TokenInfo?>?{
         return if (tokenInfo != null){
             Single.create { it.onSuccess(tokenInfo!!) }
         }else{
@@ -83,10 +74,10 @@ class TokenManager(private val tokenService: TokenService?,
         }
     }
 
-    fun getTokenTransferFee(
-        recipient: String = "",
-        amount: BigInteger = BigInteger.ZERO,
-        gasPrice: BigInteger = BigInteger(Config.Transaction.DEFAULT_GAS_PRICE)
+    override fun getTokenTransferFee(
+            recipient: String,
+            amount: BigInteger,
+            gasPrice: BigInteger
     ) : Single<Pair<BigInteger, UnitType>>?{
         return tRC21Service?.isTRC21Token(tokenAddress!!)
             ?.flatMap {isTRC21 ->
@@ -105,10 +96,10 @@ class TokenManager(private val tokenService: TokenService?,
     }
 
 
-    fun getFormattedTokenTransferFee(
-        recipient: String = "",
-        amount: BigInteger = BigInteger.ZERO,
-        gasPrice: BigInteger = BigInteger(Config.Transaction.DEFAULT_GAS_PRICE)
+    override fun getFormattedTokenTransferFee(
+            recipient: String,
+            amount: BigInteger,
+            gasPrice: BigInteger
     ) : Single<Pair<BigDecimal, UnitType>>?{
         return tRC21Service?.isTRC21Token(tokenAddress!!)
             ?.flatMap {isTRC21 ->
@@ -128,11 +119,11 @@ class TokenManager(private val tokenService: TokenService?,
 
 
     @SuppressLint("CheckResult")
-    fun transferToken(recipient: String,
-                      amount: BigInteger,
-                      callback: TransactionListener?,
-                      gasPrice: BigInteger? = BigInteger(Config.Transaction.DEFAULT_GAS_PRICE),
-                      gasLimit: BigInteger? = null){
+    override fun transferToken(recipient: String,
+                               amount: BigInteger,
+                               callback: TransactionListener?,
+                               gasPrice: BigInteger?,
+                               gasLimit: BigInteger?){
         tRC21Service?.isTRC21Token(tokenAddress!!)
             ?.subscribe { isTRC21 ->
                 if (isTRC21){
@@ -145,11 +136,11 @@ class TokenManager(private val tokenService: TokenService?,
 
 
     @SuppressLint("CheckResult")
-    fun transferFormattedToken(recipient: String,
-                      amount: BigDecimal,
-                      callback: TransactionListener?,
-                      gasPrice: BigInteger? = BigInteger(Config.Transaction.DEFAULT_GAS_PRICE),
-                      gasLimit: BigInteger? = null){
+    override fun transferFormattedToken(recipient: String,
+                                        amount: BigDecimal,
+                                        callback: TransactionListener?,
+                                        gasPrice: BigInteger?,
+                                        gasLimit: BigInteger?){
         tRC21Service?.isTRC21Token(tokenAddress!!)
             ?.subscribe { isTRC21 ->
                 val amountToken = amount.multiply(BigDecimal.TEN.pow(getToken().decimal))

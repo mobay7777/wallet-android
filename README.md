@@ -8,6 +8,7 @@
 - [Manage wallet](#manage_wallet)
 - [Sign data](#sign_data)
 - [Blockchain methods](#blockchain_methods)
+- [Wallet Secret](#wallet_secret)
 
 
 ## <a name=installation>Installation</a>
@@ -123,3 +124,101 @@ WalletCore.getInstance("your-wallet-address")
 - The function will calculate the amount of gas needed to transfer if `gasLimit` is not specified.
 - `onTransactionComplete` is triggered when the transaction is done, with `0x1` as success, otherwise is fail.
 - The `onTransactionError` is called when the transaction failed to create (not pushed to chain yet).
+
+## <a name=tokens>Tokens</a>
+
+WalletCore currently support `TRC20` and `TRC21` standard. To use the Token service, you can call the `Trc20TokenService`, `Trc21TokenService`, or simply call `TokenManager` without any doubt of knowing which type of current token.
+
+```kotlin
+interface TokenService : BaseService {
+    fun getBalance(tokenAddress: String?) : Single<BigInteger>
+    fun getBalance(tokenInfo: TokenInfo?) : Single<BigInteger>
+    fun getName(tokenAddress: String?) : Single<String>
+    fun getSymbol(tokenAddress: String?) : Single<String>
+    fun getDecimal(tokenAddress: String?) : Single<Int>
+    fun getTotalSupply(tokenAddress: String?) : Single<BigInteger>
+    fun getTokenInfo(tokenAddress: String?) : Single<TokenInfo?>
+}
+
+interface TRC20Service : TokenService{
+    fun transferToken(
+            tokenAddress: String,
+            recipient: String,
+            amount: BigInteger,
+            callback: TransactionListener?,
+            gasPrice: BigInteger? =
+            BigInteger(Config.Transaction.DEFAULT_GAS_PRICE),
+            gasLimit: BigInteger? = null
+    )
+    fun estimateTokenTransferGasLimit(
+    	tokenAddress: String,
+    	recipient: String,
+    	amount: BigInteger): Single<BigInteger>
+}
+
+interface TRC21Service : TokenService {
+    fun transferToken(
+            tokenAddress: String,
+            recipient: String,
+            amount: BigInteger,
+            callback: TransactionListener?,
+            gasPrice: BigInteger? = 
+            BigInteger(Config.Transaction.DEFAULT_GAS_PRICE),
+            gasLimit: BigInteger? = null
+    )
+
+    fun isTRC21Token(tokenAddress: String) : Single<Boolean>
+    fun getTokenTransferFee(tokenAddress: String): Single<BigInteger>
+    fun isTOMOZApplied(tokenAddress: String) : Single<Boolean>
+    fun getTOMOZContractList() : Single<List<String>>
+}
+
+```
+
+**Note** 
+
+- The `amount` parameter of `transferToken` function must be in the smallest unit of token. For example, if you want to transfer 100 TRC20 Token with `decimal`of 12, then the function should look like (use `BigDecimal` for amount with decimal value):
+
+```kotlin
+WalletCore.getInstance("your-wallet-address")
+	?.trc20TokenService
+	?.transferToken(
+		"token-contract-address",
+		"recipient-address",
+		BigInteger("100")
+			.multiply(BigInteger.TEN.pow(12)), 
+		callback = object : TransactionListener{})
+```
+- TRC21 transferToken method will check if the token is already applied to TomoZ before making transaction
+- TRC21 `isTRC21Token`method will call `issuer` function from contract, so any contract with this function provided will be recognized as TRC21 contract.
+- TRC21 `getTokenTransferFee` will call coressponding function from contract, and return `wei` value of TOMO or token unit due to each contract.
+
+Beside individual token service, WalletCore also provide `TokenManagerService` to manage token easier. This service will auto recognize the Token information, and choose the right method to execute. This utility only require contract address when called.
+
+```kotlin
+WalletCore.getInstance("your-wallet-address")
+	?.tokenManager
+	?.withTokenAddress("contract-address")
+	?.getTokenFormattedBalance()
+	?.subscribe({
+		//eg: 10.25
+	},{
+		
+	})
+``` 
+
+## <a name=wallet_secret>Wallet Secret</a>
+
+The only way to get sensitive information of wallet (recovery phrase, private key) is through `WalletSecretDataService`. This service obtain wallet address and return sensitive information if existed.
+
+```kotlin
+WalletCore.getInstance()
+	?.walletSecretDataService
+	?.getPrivateKey(""your-wallet-address"")
+	?.subscribe({	},{})
+```
+
+**Note** 
+
+- These methods always return a `StringBuilder` which contain **plain** sensitve information. You should call it only when you need, and clear the stringBuilder when you don't need it anymore.
+

@@ -1,6 +1,7 @@
 package com.tomochain.wallet.core.w3jl.components.tomochain.token
 
 import android.annotation.SuppressLint
+import com.tomochain.wallet.core.common.BaseService
 import com.tomochain.wallet.core.common.Config
 import com.tomochain.wallet.core.w3jl.listeners.TransactionListener
 import io.reactivex.Single
@@ -13,9 +14,8 @@ import java.math.BigInteger
  * Ping me at nienbkict@gmail.com
  * Happy coding ^_^
  */
-interface TokenManagerService {
+interface TokenManagerService : BaseService{
     fun withTokenAddress(tokenAddress: String?) : TokenManagerImpl
-    fun withWalletAddress(walletAddress: String?) : TokenManagerImpl
     fun getToken() : TokenInfo
     fun getTokenBalance() : Single<BigInteger>?
     fun getTokenFormattedBalance() : Single<BigDecimal>?

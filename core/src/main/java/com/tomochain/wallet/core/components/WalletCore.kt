@@ -63,7 +63,7 @@ class WalletCore {
             instance?.tokenService?.setWalletAddress(address)
             instance?.trc20TokenService?.setWalletAddress(address)
             instance?.trc21TokenService?.setWalletAddress(address)
-
+            instance?.tokenManager?.setWalletAddress(address)
             return instance
         }
 

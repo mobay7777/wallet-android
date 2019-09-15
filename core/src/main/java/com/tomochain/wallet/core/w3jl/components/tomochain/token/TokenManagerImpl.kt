@@ -27,7 +27,7 @@ class TokenManagerImpl(private val tokenService: TokenService?,
     }
 
     private var tokenInfo : TokenInfo? = null
-    private var walletAddress: String? = null
+    private var address: String? = null
     private var tokenAddress: String? = null
 
     override fun withTokenAddress(tokenAddress: String?) : TokenManagerImpl{
@@ -36,12 +36,11 @@ class TokenManagerImpl(private val tokenService: TokenService?,
         return this
     }
 
-    override fun withWalletAddress(walletAddress: String?) : TokenManagerImpl {
-        this.walletAddress = walletAddress
-        this.tokenService?.setWalletAddress(walletAddress)
-        this.tRC20Service?.setWalletAddress(walletAddress)
-        this.tRC21Service?.setWalletAddress(walletAddress)
-        return this
+    override fun setWalletAddress(address: String?) {
+        this.address = address
+        this.tokenService?.setWalletAddress(address)
+        this.tRC20Service?.setWalletAddress(address)
+        this.tRC21Service?.setWalletAddress(address)
     }
 
     override fun getToken() : TokenInfo{

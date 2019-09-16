@@ -33,7 +33,6 @@ class WalletServiceImpl(private val habak: Habak?) : WalletService {
         return try{
             MnemonicUtils.getWords()
         }catch(e: Exception){
-            Log.e(LogTag.TAG_W3JL, "getWordList",e)
             arrayListOf()
         }
     }
@@ -45,17 +44,18 @@ class WalletServiceImpl(private val habak: Habak?) : WalletService {
             secureRandom.nextBytes(initialEntropy)
             MnemonicUtils.generateMnemonic(initialEntropy)
         }catch(e: Exception){
-            Log.e(LogTag.TAG_W3JL, "generateMnemonics",e)
             ""
         }
     }
 
-    override fun createWalletFromMnemonics(mnemonic: String,
+    override fun createWallet(hdPath: String): Single<EntityWalletSecret?> {
+        return importWalletFromMnemonics(generateMnemonics(), hdPath)
+    }
+
+    override fun importWalletFromMnemonics(mnemonic: String,
                                            hdPath: String): Single<EntityWalletSecret?> {
         return Single.create {
             try{
-
-
                 if (!WalletUtil.isValidMnemonics(mnemonic, true)){
                     it.onError(InvalidMnemonicException())
                     return@create
@@ -75,13 +75,12 @@ class WalletServiceImpl(private val habak: Habak?) : WalletService {
                     hdPath)
                 it.onSuccess(wallet)
             }catch(e: Exception){
-                Log.e(LogTag.TAG_W3JL, "createWalletFromMnemonics", e)
                 it.onError(e)
             }
         }
     }
 
-    override fun createWalletFromPrivateKey(privateKey: String): Single<EntityWalletSecret?> {
+    override fun importWalletFromPrivateKey(privateKey: String): Single<EntityWalletSecret?> {
         return Single.create{
             try{
                 if (!WalletUtils.isValidPrivateKey(privateKey)){
@@ -100,13 +99,12 @@ class WalletServiceImpl(private val habak: Habak?) : WalletService {
                     "")
                 it.onSuccess(wallet)
             }catch(e: Exception){
-                Log.e(LogTag.TAG_W3JL, "createWalletFromPrivateKey",e)
                 it.onError(e)
             }
         }
     }
 
-    override fun createWalletFromAddress(address: String): Single<EntityWalletSecret?> {
+    override fun importWalletFromAddress(address: String): Single<EntityWalletSecret?> {
         return Single.create{
             try{
                 if (!WalletUtils.isValidAddress(address)){
@@ -123,11 +121,8 @@ class WalletServiceImpl(private val habak: Habak?) : WalletService {
                     "")
                 it.onSuccess(wallet)
             }catch(e: Exception){
-                Log.e(LogTag.TAG_W3JL, "createWalletFromPrivateKey",e)
                 it.onError(e)
             }
         }
     }
-
-
 }

@@ -22,5 +22,5 @@ interface SignerService : BaseService {
         amount: BigInteger?,
         gasPrice: BigInteger? = BigInteger(Config.Transaction.DEFAULT_GAS_PRICE),
         gasLimit: BigInteger? = BigInteger(Config.Transaction.DEFAULT_GAS_LIMIT),
-        payload: String?) : Single<SignResult>?
+        payload: String? = null) : Single<SignResult>?
 }

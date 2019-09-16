@@ -1,5 +1,6 @@
 package com.tomochain.wallet.core.wallet
 
+import com.tomochain.wallet.core.common.BaseService
 import io.reactivex.Single
 import java.lang.StringBuilder
 
@@ -9,8 +10,8 @@ import java.lang.StringBuilder
  * Ping me at nienbkict@gmail.com
  * Happy coding ^_^
  */
-interface WalletSecretDataService {
+interface WalletSecretDataService : BaseService{
 
-    fun getPrivateKey(walletAddress: String?) : Single<StringBuilder>
-    fun getMnemonics(walletAddress: String?) : Single<StringBuilder>
+    fun getPrivateKey() : Single<StringBuilder>
+    fun getMnemonics() : Single<StringBuilder>
 }

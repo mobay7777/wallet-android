@@ -18,8 +18,13 @@ import java.lang.NullPointerException
 class WalletSecretDataImpl(private val  habak: Habak?,
                            private val  dao: DatabaseWalletSecret?) : WalletSecretDataService{
 
+    private var walletAddress: String? = ""
 
-    override fun getPrivateKey(walletAddress: String?): Single<StringBuilder> {
+    override fun setWalletAddress(address: String?) {
+        this.walletAddress = address
+    }
+
+    override fun getPrivateKey(): Single<StringBuilder> {
         return Single.create {emitter ->
             try{
                 if (habak == null || dao == null) {
@@ -30,13 +35,13 @@ class WalletSecretDataImpl(private val  habak: Habak?,
                     emitter.onError(InvalidAddressException())
                     return@create
                 }
-                dao!!.walletDAO().getWallet(walletAddress!!).subscribe(
+                dao.walletDAO().getWallet(walletAddress!!).subscribe(
                     { wallet ->
                         if (wallet == null){
                             emitter.onSuccess(StringBuilder(""))
                         }else{
                             val e = EncryptedModel.readFromString(wallet.encryptedPKey)
-                            emitter.onSuccess(habak?.decrypt(e) ?: StringBuilder(""))
+                            emitter.onSuccess(habak.decrypt(e))
                         }
 
                     },{
@@ -49,7 +54,7 @@ class WalletSecretDataImpl(private val  habak: Habak?,
         }
     }
 
-    override fun getMnemonics(walletAddress: String?): Single<StringBuilder> {
+    override fun getMnemonics(): Single<StringBuilder> {
         return Single.create {emitter ->
             try{
                 if (habak == null || dao == null) {
@@ -60,13 +65,13 @@ class WalletSecretDataImpl(private val  habak: Habak?,
                     emitter.onError(InvalidAddressException())
                     return@create
                 }
-                dao!!.walletDAO().getWallet(walletAddress!!).subscribe(
+                dao.walletDAO().getWallet(walletAddress!!).subscribe(
                     { wallet ->
                         if (wallet == null){
                             emitter.onSuccess(StringBuilder(""))
                         }else{
                             val e = EncryptedModel.readFromString(wallet.encryptedSeed)
-                            emitter.onSuccess(habak?.decrypt(e) ?: StringBuilder(""))
+                            emitter.onSuccess(habak.decrypt(e))
                         }
 
                     },{

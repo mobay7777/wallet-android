@@ -1,10 +1,7 @@
 package com.tomochain.wallet.core.common.di
 
 import android.content.Context
-import com.tomochain.wallet.core.components.CoreConfig
-import com.tomochain.wallet.core.components.CoreFunctions
-import com.tomochain.wallet.core.components.CoreFunctionsImpl
-import com.tomochain.wallet.core.components.DefaultConfig
+import com.tomochain.wallet.core.components.*
 import com.tomochain.wallet.core.habak.HabakFactory
 import com.tomochain.wallet.core.habak.cryptography.Habak
 import com.tomochain.wallet.core.room.walletSecret.DatabaseWalletSecret
@@ -112,6 +109,14 @@ class CoreModule(var context: WeakReference<Context>,
         return TokenManagerImpl(
             TokenServiceImpl(null, getWeb3JService(), config.chain()),
             getTRC20Service(), getTRC21Service()
+        )
+    }
+
+
+    @Provides
+    fun getWalletFunctions() : WalletFunctions {
+        return WalletFunctionsImpl(
+            getCoreBlockChainService(), getSignerService()
         )
     }
 }

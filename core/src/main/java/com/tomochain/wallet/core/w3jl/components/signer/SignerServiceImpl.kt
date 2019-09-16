@@ -27,10 +27,11 @@ class SignerServiceImpl(var address: String?,
                         private val web3j: Web3j?) : SignerService {
     override fun setWalletAddress(address: String?) {
         this.address = address
+        this.walletSecretDataService?.setWalletAddress(address)
     }
 
     override fun signRawMessage(message: String?): Single<SignResult>? {
-        return walletSecretDataService?.getPrivateKey(address!!)
+        return walletSecretDataService?.getPrivateKey()
             ?.flatMap {pKey ->
                 Single.create<SignResult> {
                     try{
@@ -98,7 +99,7 @@ class SignerServiceImpl(var address: String?,
     }
 
     override fun signPersonalMessage(message: String?): Single<SignResult>? {
-        return walletSecretDataService?.getPrivateKey(address!!)
+        return walletSecretDataService?.getPrivateKey()
             ?.flatMap {pKey ->
                 Single.create<SignResult> {
                     try{
@@ -169,7 +170,7 @@ class SignerServiceImpl(var address: String?,
         gasLimit: BigInteger?,
         payload: String?
     ): Single<SignResult>? {
-        return walletSecretDataService?.getPrivateKey(address!!)
+        return walletSecretDataService?.getPrivateKey()
             ?.flatMap {pKey ->
                 Single.create<SignResult> {
                     try{

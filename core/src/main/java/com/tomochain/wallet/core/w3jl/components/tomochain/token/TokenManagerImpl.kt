@@ -159,4 +159,11 @@ class TokenManagerImpl(private val tokenService: TokenService?,
             }
     }
 
+    override fun getTRC20Services(): TRC20Service? {
+        return tRC20Service
+    }
+
+    override fun getTRC21Services(): TRC21Service? {
+        return tRC21Service
+    }
 }

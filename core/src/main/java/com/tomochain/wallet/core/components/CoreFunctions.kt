@@ -12,11 +12,13 @@ import io.reactivex.Single
  */
 interface CoreFunctions {
 
-    fun createWalletFromMnemonics(mnemonics: String?, hdPath: String = Config.HDPath.TOMO) : Single<String>
+    fun createWallet(hdPath: String = Config.HDPath.TOMO) : Single<String>
 
-    fun createWalletFromPrivateKey(privateKey: String?) : Single<String>
+    fun importWalletFromMnemonics(mnemonics: String?, hdPath: String = Config.HDPath.TOMO) : Single<String>
 
-    fun createWalletFromAddress(address: String?) : Single<String>
+    fun importWalletFromPrivateKey(privateKey: String?) : Single<String>
+
+    fun importWalletFromAddress(address: String?) : Single<String>
 
     fun getAllWallet() : Single<MutableList<EntityWalletSecret>>
 

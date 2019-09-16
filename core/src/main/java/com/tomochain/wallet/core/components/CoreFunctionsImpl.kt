@@ -19,7 +19,11 @@ class CoreFunctionsImpl(private val dao: DatabaseWalletSecret?,
                         private val walletService: WalletService?) : CoreFunctions{
 
 
-    override fun createWalletFromMnemonics(mnemonics: String?, hdPath: String): Single<String> {
+    override fun createWallet(hdPath: String): Single<String> {
+        return importWalletFromMnemonics(walletService?.generateMnemonics(), hdPath)
+    }
+
+    override fun importWalletFromMnemonics(mnemonics: String?, hdPath: String): Single<String> {
         return Single.create {emitter ->
             try{
                 if ( dao == null || walletService == null) {
@@ -31,14 +35,14 @@ class CoreFunctionsImpl(private val dao: DatabaseWalletSecret?,
                     emitter.onError(InvalidMnemonicException())
                     return@create
                 }
-                val entityWalletKey = walletService?.createWalletFromMnemonics(mnemonics!!, hdPath)?.blockingGet()
+                val entityWalletKey = walletService.importWalletFromMnemonics(mnemonics!!, hdPath)?.blockingGet()
 
                 if (entityWalletKey == null) {
                     emitter.onError(WalletNotFoundException())
                     return@create
                 }
 
-                dao!!.walletDAO().getWallet(entityWalletKey.address)
+                dao.walletDAO().getWallet(entityWalletKey.address)
                     .subscribe(
                         {
                             emitter.onError(WalletAlreadyExistedException())
@@ -46,7 +50,7 @@ class CoreFunctionsImpl(private val dao: DatabaseWalletSecret?,
                         },
                         {
 
-                            dao!!.walletDAO().addNewWallet(entityWalletKey)
+                            dao.walletDAO().addNewWallet(entityWalletKey)
                                 .subscribe({
                                     emitter.onSuccess(entityWalletKey.address)
                                     entityWalletKey.clearContent()
@@ -63,7 +67,7 @@ class CoreFunctionsImpl(private val dao: DatabaseWalletSecret?,
         }
     }
 
-    override fun createWalletFromPrivateKey(privateKey: String?): Single<String> {
+    override fun importWalletFromPrivateKey(privateKey: String?): Single<String> {
         return Single.create {emitter ->
             try{
                 if ( dao == null || walletService == null) {
@@ -75,14 +79,14 @@ class CoreFunctionsImpl(private val dao: DatabaseWalletSecret?,
                     emitter.onError(InvalidMnemonicException())
                     return@create
                 }
-                val entityWalletKey = walletService?.createWalletFromPrivateKey(privateKey!!)?.blockingGet()
+                val entityWalletKey = walletService.importWalletFromPrivateKey(privateKey!!)?.blockingGet()
 
                 if (entityWalletKey == null) {
                     emitter.onError(WalletNotFoundException())
                     return@create
                 }
 
-                dao!!.walletDAO().getWallet(entityWalletKey.address)
+                dao.walletDAO().getWallet(entityWalletKey.address)
                     .subscribe(
                         {
                             emitter.onError(WalletAlreadyExistedException())
@@ -90,7 +94,7 @@ class CoreFunctionsImpl(private val dao: DatabaseWalletSecret?,
                         },
                         {
 
-                            dao!!.walletDAO().addNewWallet(entityWalletKey)
+                            dao.walletDAO().addNewWallet(entityWalletKey)
                                 .subscribe({
                                     emitter.onSuccess(entityWalletKey.address)
                                     entityWalletKey.clearContent()
@@ -107,7 +111,7 @@ class CoreFunctionsImpl(private val dao: DatabaseWalletSecret?,
         }
     }
 
-    override fun createWalletFromAddress(address: String?): Single<String> {
+    override fun importWalletFromAddress(address: String?): Single<String> {
         return Single.create {emitter ->
             try{
                 if ( dao == null || walletService == null) {
@@ -119,20 +123,20 @@ class CoreFunctionsImpl(private val dao: DatabaseWalletSecret?,
                     emitter.onError(InvalidAddressException())
                     return@create
                 }
-                val entityWalletKey = walletService?.createWalletFromAddress(address!!)?.blockingGet()
+                val entityWalletKey = walletService.importWalletFromAddress(address!!)?.blockingGet()
 
                 if (entityWalletKey == null) {
                     emitter.onError(WalletNotFoundException())
                     return@create
                 }
 
-                dao!!.walletDAO().getWallet(entityWalletKey.address)
+                dao.walletDAO().getWallet(entityWalletKey.address)
                     .subscribe(
                         {
                             emitter.onError(WalletAlreadyExistedException())
                         },
                         {
-                            dao!!.walletDAO().addNewWallet(entityWalletKey)
+                            dao.walletDAO().addNewWallet(entityWalletKey)
                                 .subscribe({
                                     emitter.onSuccess(entityWalletKey.address)
                                     entityWalletKey.clearContent()
@@ -156,7 +160,7 @@ class CoreFunctionsImpl(private val dao: DatabaseWalletSecret?,
                     return@create
                 }
 
-                dao!!.walletDAO().getAllWallet().subscribe(
+                dao.walletDAO().getAllWallet().subscribe(
                     { list ->
                         val list1 : MutableList<EntityWalletSecret> = arrayListOf()
                         list.forEach {wallet ->
@@ -185,7 +189,7 @@ class CoreFunctionsImpl(private val dao: DatabaseWalletSecret?,
                     emitter.onError(InvalidAddressException())
                     return@create
                 }
-                dao!!.walletDAO().getWallet(address!!).subscribe(
+                dao.walletDAO().getWallet(address!!).subscribe(
                     { wallet ->
                         wallet?.clearContent()
                         emitter.onSuccess(wallet!!)
@@ -210,10 +214,10 @@ class CoreFunctionsImpl(private val dao: DatabaseWalletSecret?,
                     emitter.onError(InvalidAddressException())
                     return@create
                 }
-                dao!!.walletDAO().getWallet(address!!)
+                dao.walletDAO().getWallet(address!!)
                     .subscribe(
                         { wallet ->
-                            dao!!.walletDAO().deleteWallet(wallet!!).subscribe()
+                            dao.walletDAO().deleteWallet(wallet!!).subscribe()
                             emitter.onSuccess(wallet)
                         },
                         {

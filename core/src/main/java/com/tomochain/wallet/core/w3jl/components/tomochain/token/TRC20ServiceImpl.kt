@@ -58,8 +58,8 @@ class TRC20ServiceImpl( override var address: String?,
                 callback?.onTransactionError(InvalidAddressException())
                 return
             }
-
-            walletSecretDataService?.getPrivateKey(address!!)?.subscribe(
+            walletSecretDataService?.setWalletAddress(address)
+            walletSecretDataService?.getPrivateKey()?.subscribe(
                 { pKey ->
                     if ( !WalletUtil.isValidPrivateKey(pKey.toString())){
                         callback?.onTransactionError(InvalidPrivateKeyException())

@@ -45,4 +45,7 @@ interface TokenManagerService : BaseService{
                                callback: TransactionListener?,
                                gasPrice: BigInteger? = BigInteger(Config.Transaction.DEFAULT_GAS_PRICE),
                                gasLimit: BigInteger? = null)
+
+    fun getTRC20Services() : TRC20Service?
+    fun getTRC21Services() : TRC21Service?
 }

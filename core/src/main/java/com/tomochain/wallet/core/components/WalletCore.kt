@@ -43,6 +43,8 @@ class WalletCore {
     lateinit var walletService: WalletService
     @Inject
     lateinit var walletSecretDataService: WalletSecretDataService
+    @Inject
+    lateinit var walletFunctions: WalletFunctions
 
 
     companion object{
@@ -56,7 +58,7 @@ class WalletCore {
             instance?.getCoreComponent()?.inject(instance)
         }
 
-        fun getInstance(address: String) : WalletCore?{
+        private fun getInstance(address: String) : WalletCore?{
             instance?.address = address
             instance?.coreBlockChainService?.setWalletAddress(address)
             instance?.signerService?.setWalletAddress(address)
@@ -64,15 +66,36 @@ class WalletCore {
             instance?.trc20TokenService?.setWalletAddress(address)
             instance?.trc21TokenService?.setWalletAddress(address)
             instance?.tokenManager?.setWalletAddress(address)
+            instance?.walletFunctions?.setWalletAddress(address)
+            instance?.walletSecretDataService?.setWalletAddress(address)
             return instance
         }
 
-        fun getInstance() : WalletCore?{
+        private fun getInstance() : WalletCore?{
             return instance
         }
 
         fun destroyInstance() {
             instance = null
+        }
+
+
+        fun getCoreFunctions() : CoreFunctions?{
+            return instance?.coreFunctions
+        }
+
+        fun getWalletFunctions(walletAddress: String) : WalletFunctions?{
+            return getInstance(walletAddress)?.walletFunctions
+        }
+
+        fun getTokenManager(walletAddress: String, tokenAddress: String?) : TokenManagerService?{
+            return getInstance(walletAddress)?.tokenManager?.withTokenAddress(tokenAddress)
+        }
+
+        fun getWalletSecretData(walletAddress: String) : WalletSecretDataService?{
+            val s = getInstance(walletAddress)?.walletSecretDataService
+            s?.setWalletAddress(walletAddress)
+            return s
         }
 
     }
@@ -82,8 +105,13 @@ class WalletCore {
     }
 
 
+
+
     private fun getCoreComponent() : CoreComponent{
         return DaggerCoreComponent.builder()
             .coreModule(context?.let { CoreModule(it, config) }).build()
     }
+
+
+
 }

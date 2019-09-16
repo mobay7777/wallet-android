@@ -37,6 +37,7 @@ class BlockChainServiceImpl(var address: String?,
 
     override fun setWalletAddress(address: String?) {
         this.address = address
+        this.walletSecretDataService?.setWalletAddress(address)
     }
 
 
@@ -114,7 +115,7 @@ class BlockChainServiceImpl(var address: String?,
                     emitter.onError(InvalidAddressException())
                     return@create
                 }
-                val pKey =  walletSecretDataService?.getPrivateKey(address!!)?.blockingGet()
+                val pKey =  walletSecretDataService?.getPrivateKey()?.blockingGet()
                 if(pKey == null || pKey.isEmpty()){
                     emitter.onError(WalletNotFoundException())
                     return@create
@@ -180,7 +181,7 @@ class BlockChainServiceImpl(var address: String?,
                 callback?.onTransactionError(InvalidAddressException())
                 return
             }
-            val pKey = walletSecretDataService?.getPrivateKey(address!!)?.blockingGet()
+            val pKey = walletSecretDataService?.getPrivateKey()?.blockingGet()
             if(pKey == null || pKey.isEmpty()){
                 callback?.onTransactionError(WalletNotFoundException())
                 return

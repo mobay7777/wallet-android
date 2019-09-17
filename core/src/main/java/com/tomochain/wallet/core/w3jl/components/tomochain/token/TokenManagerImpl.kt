@@ -5,7 +5,9 @@ import com.tomochain.wallet.core.common.Config
 import com.tomochain.wallet.core.common.exception.InvalidAmountException
 import com.tomochain.wallet.core.w3jl.listeners.TransactionListener
 import com.tomochain.wallet.core.w3jl.utils.ConvertUtil
+import io.reactivex.Flowable
 import io.reactivex.Single
+import io.reactivex.functions.BiFunction
 import java.math.BigDecimal
 import java.math.BigInteger
 
@@ -79,8 +81,12 @@ class TokenManagerImpl(private val tokenService: TokenService?,
             gasPrice: BigInteger
     ) : Single<Pair<BigInteger, UnitType>>?{
         return tRC21Service?.isTRC21Token(tokenAddress!!)
-            ?.flatMap {isTRC21 ->
-                if (isTRC21){
+            ?.zipWith(tRC21Service.isTOMOZApplied(tokenAddress!!),
+                BiFunction<Boolean, Boolean, Boolean> { isTRC21Token, isTOMOZApplied ->
+                    isTOMOZApplied || isTRC21Token
+                })
+            ?.flatMap{result ->
+                if (result){
                     tRC21Service.getTokenTransferFee(tokenAddress!!)
                         .map {
                             Pair(it, UnitType.TOKEN_AT_UNIT)
@@ -91,7 +97,35 @@ class TokenManagerImpl(private val tokenService: TokenService?,
                             Pair(it.multiply(gasPrice), UnitType.TOMO_AT_WEI)
                         }
                 }
+
             }
+
+        /*return tRC21Service?.isTRC21Token(tokenAddress!!)
+
+            ?.flatMap {isTRC21 ->
+                if (isTRC21){
+                    tRC21Service.isTOMOZApplied(tokenAddress!!)
+                        .flatMap { isTOMOZApplied ->
+                            if (isTOMOZApplied){
+                                tRC21Service.getTokenTransferFee(tokenAddress!!)
+                                    .map {
+                                        Pair(it, UnitType.TOKEN_AT_UNIT)
+                                    }
+                            }else{
+                                tRC20Service?.estimateTokenTransferGasLimit(tokenAddress!!, recipient, amount)
+                                    ?.map {
+                                        Pair(it.multiply(gasPrice), UnitType.TOMO_AT_WEI)
+                                    }
+                            }
+
+                        }
+                }else{
+                    tRC20Service?.estimateTokenTransferGasLimit(tokenAddress!!, recipient, amount)
+                        ?.map {
+                            Pair(it.multiply(gasPrice), UnitType.TOMO_AT_WEI)
+                        }
+                }
+            }*/
     }
 
 

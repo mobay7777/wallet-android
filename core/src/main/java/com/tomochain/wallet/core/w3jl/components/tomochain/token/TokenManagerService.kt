@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import com.tomochain.wallet.core.common.BaseService
 import com.tomochain.wallet.core.common.Config
 import com.tomochain.wallet.core.w3jl.listeners.TransactionListener
+import io.reactivex.Flowable
 import io.reactivex.Single
 import java.math.BigDecimal
 import java.math.BigInteger

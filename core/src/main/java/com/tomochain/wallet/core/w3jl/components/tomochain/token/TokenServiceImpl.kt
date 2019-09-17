@@ -85,7 +85,7 @@ open class TokenServiceImpl(open var address: String?,
                 if (response.size == 1) {
                     emitter.onSuccess((response[0] as Utf8String).value)
                 } else {
-                    emitter.onSuccess("Unknown name!")
+                    emitter.onSuccess("Not a Token contract")
                 }
             }catch(t: Throwable){
                 emitter.onError(t)
@@ -112,7 +112,7 @@ open class TokenServiceImpl(open var address: String?,
                 if (response.size == 1) {
                     emitter.onSuccess(String((response[0] as Utf8String).value.toByteArray()))
                 } else {
-                    emitter.onSuccess("Unknown name!")
+                    emitter.onSuccess("Not a Token contract")
                 }
             }catch(t: Throwable){
                 emitter.onError(t)
@@ -139,7 +139,7 @@ open class TokenServiceImpl(open var address: String?,
                 if (response.size == 1) {
                     emitter.onSuccess(BigDecimal((response[0] as Uint8).value).intValueExact())
                 } else {
-                    emitter.onError(NullPointerException())
+                    emitter.onSuccess(-1)
                 }
             }catch(t: Throwable){
                 emitter.onError(t)
@@ -167,7 +167,7 @@ open class TokenServiceImpl(open var address: String?,
                 if (response.size == 1) {
                     emitter.onSuccess((response[0] as Uint256).value)
                 } else {
-                    emitter.onError(NullPointerException())
+                    emitter.onSuccess(BigInteger.ZERO)
                 }
             }catch(t: Throwable){
                 emitter.onError(t)

@@ -175,24 +175,27 @@ class TRC21ServiceImpl(override var address: String?,
     }
 
     override fun getTokenTransferFee(tokenAddress: String): Single<BigInteger> {
-        val function = Function(
-                "estimateFee",
-                listOf(Uint256(0)),
-                listOf(object : TypeReference<Uint256>() {
 
-                }))
+        val function = Function(
+            "estimateFee",
+            listOf(Uint256(0)),
+            listOf(object : TypeReference<Uint256>() {
+
+            }))
+
         return Single.create{ emitter ->
             val responseValue = callSmartContractFunction(function, tokenAddress, address ?: Config.Address.DEFAULT)
             val response = FunctionReturnDecoder.decode(
-                    responseValue, function.outputParameters)
+                responseValue, function.outputParameters)
             if (response.size == 1) {
                 emitter.onSuccess((response[0] as Uint256).value)
             } else {
                 emitter.onError(NullPointerException())
             }
         }
-    }
 
+
+    }
 
     override fun isTOMOZApplied(tokenAddress: String): Single<Boolean> {
         val function = Function(

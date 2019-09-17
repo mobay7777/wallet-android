@@ -21,6 +21,7 @@ import org.web3j.crypto.TransactionEncoder
 import org.web3j.protocol.Web3j
 import org.web3j.protocol.core.DefaultBlockParameterName
 import org.web3j.utils.Numeric
+import java.lang.IllegalStateException
 import java.math.BigInteger
 
 
@@ -218,7 +219,8 @@ class BlockChainServiceImpl(var address: String?,
             val signedMessage = TransactionEncoder.signMessage(rawTransaction, credentials)
             val signedMessageHex  = Numeric.toHexString(signedMessage)
 
-            web3j?.ethSendRawTransaction(signedMessageHex)?.flowable()?.subscribe({transaction ->
+            val transaction =web3j?.ethSendRawTransaction(signedMessageHex)?.send()
+            if (transaction != null && transaction.transactionHash != null){
                 callback?.onTransactionCreated(transaction.transactionHash)
                 web3j?.ethGetTransactionReceipt(transaction.transactionHash)
                     ?.flowable()
@@ -234,9 +236,9 @@ class BlockChainServiceImpl(var address: String?,
                     ?.subscribe {
                         callback?.onTransactionComplete(transaction.transactionHash, it)
                     }
-            }, {
-                callback?.onTransactionError(it as Exception)
-            })
+            }else{
+                callback?.onTransactionError(IllegalStateException(transaction?.error?.message))
+            }
 
         }catch(t: Throwable){
             Log.e(LogTag.TAG_W3JL,"CoreBlockChainServiceImpl > transfer: ${t.localizedMessage}")
@@ -248,7 +250,8 @@ class BlockChainServiceImpl(var address: String?,
     @SuppressLint("CheckResult")
     override fun sendSignedTransaction(signedTransaction: String?, callback: TransactionListener?) {
         try{
-            web3j?.ethSendRawTransaction(signedTransaction)?.flowable()?.subscribe({transaction ->
+            val transaction =web3j?.ethSendRawTransaction(signedTransaction)?.send()
+            if (transaction != null && transaction.transactionHash != null){
                 callback?.onTransactionCreated(transaction.transactionHash)
                 web3j?.ethGetTransactionReceipt(transaction.transactionHash)
                     ?.flowable()
@@ -264,10 +267,9 @@ class BlockChainServiceImpl(var address: String?,
                     ?.subscribe {
                         callback?.onTransactionComplete(transaction.transactionHash, it)
                     }
-            }, {
-                callback?.onTransactionError(it as Exception)
-            })
-
+            }else{
+                callback?.onTransactionError(IllegalStateException(transaction?.error?.message))
+            }
         }catch(t: Throwable){
             callback?.onTransactionError(t as Exception)
         }

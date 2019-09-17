@@ -20,6 +20,7 @@ interface BlockChainService : BaseService {
 
     fun getAccountBalance(): Single<BigInteger>
     fun getTransactionCount(): Single<BigInteger>
+    fun getTransactionStatus(txId: String?): Observable<String>?
 
     fun transfer(
         recipient: String,
@@ -41,5 +42,5 @@ interface BlockChainService : BaseService {
 
     fun sendSignedTransaction(signedTransaction: String?, callback: TransactionListener?)
 
-    fun getTransactionStatus(txId: String?): Observable<String>?
+
 }

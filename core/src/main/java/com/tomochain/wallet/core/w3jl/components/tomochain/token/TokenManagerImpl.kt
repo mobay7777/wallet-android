@@ -81,8 +81,8 @@ class TokenManagerImpl(private val tokenService: TokenService?,
         return tRC21Service?.isTRC21Token(tokenAddress!!)
             ?.flatMap {isTRC21 ->
                 if (isTRC21){
-                    tRC21Service?.getTokenTransferFee(tokenAddress!!)
-                        ?.map {
+                    tRC21Service.getTokenTransferFee(tokenAddress!!)
+                        .map {
                             Pair(it, UnitType.TOKEN_AT_UNIT)
                         }
                 }else{
@@ -103,8 +103,8 @@ class TokenManagerImpl(private val tokenService: TokenService?,
         return tRC21Service?.isTRC21Token(tokenAddress!!)
             ?.flatMap {isTRC21 ->
                 if (isTRC21){
-                    tRC21Service?.getTokenTransferFee(tokenAddress!!)
-                        ?.map {
+                    tRC21Service.getTokenTransferFee(tokenAddress!!)
+                        .map {
                             Pair(it.toBigDecimal().divide(BigDecimal.TEN.pow(getToken().decimal)), UnitType.TOKEN)
                         }
                 }else{

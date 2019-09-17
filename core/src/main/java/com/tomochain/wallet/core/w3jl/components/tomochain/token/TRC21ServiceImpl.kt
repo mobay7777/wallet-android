@@ -33,6 +33,7 @@ import org.web3j.protocol.Web3j
 import org.web3j.protocol.core.DefaultBlockParameterName
 import org.web3j.protocol.core.methods.request.Transaction
 import org.web3j.utils.Numeric
+import java.lang.IllegalStateException
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
@@ -144,25 +145,26 @@ class TRC21ServiceImpl(override var address: String?,
 
                         val signedMessage = TransactionEncoder.signMessage(rawTransaction, credentials)
                         val signedMessageHex  = Numeric.toHexString(signedMessage)
-                        web3j?.ethSendRawTransaction(signedMessageHex)?.flowable()?.subscribe({transaction ->
+                        val transaction =web3j?.ethSendRawTransaction(signedMessageHex)?.send()
+                        if (transaction != null && transaction.transactionHash != null){
                             callback?.onTransactionCreated(transaction.transactionHash)
                             web3j?.ethGetTransactionReceipt(transaction.transactionHash)
-                                    ?.flowable()
-                                    ?.toObservable()
-                                    ?.repeat()
-                                    ?.map { r ->
-                                        r.result.status
-                                    }
-                                    ?.takeUntil {
-                                        it.contains("0x", true)
-                                    }
-                                    ?.retry()
-                                    ?.subscribe {
-                                        callback?.onTransactionComplete(transaction.transactionHash, it)
-                                    }
-                        }, {
-                            callback?.onTransactionError(it as Exception)
-                        })
+                                ?.flowable()
+                                ?.toObservable()
+                                ?.repeat()
+                                ?.map { r ->
+                                    r.result.status
+                                }
+                                ?.takeUntil {
+                                    it.contains("0x", true)
+                                }
+                                ?.retry()
+                                ?.subscribe {
+                                    callback?.onTransactionComplete(transaction.transactionHash, it)
+                                }
+                        }else{
+                            callback?.onTransactionError(IllegalStateException(transaction?.error?.message))
+                        }
                     },{
                         callback?.onTransactionError(it as Exception)
                     }

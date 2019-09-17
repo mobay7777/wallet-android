@@ -61,5 +61,7 @@ class WalletFunctionsImpl(private val blockChainService: BlockChainService?,
         blockChainService?.transfer(recipient, amount, payload, gasPrice, gasLimit, callback)
     }
 
-
+    override fun getBalance(): Single<BigInteger>? {
+        return blockChainService?.getAccountBalance()
+    }
 }

@@ -4,6 +4,7 @@ import com.tomochain.wallet.core.common.BaseService
 import com.tomochain.wallet.core.common.Config
 import com.tomochain.wallet.core.w3jl.components.signer.SignResult
 import com.tomochain.wallet.core.w3jl.listeners.TransactionListener
+
 import io.reactivex.Single
 import java.math.BigInteger
 
@@ -14,6 +15,7 @@ import java.math.BigInteger
  * Happy coding ^_^
  */
 interface WalletFunctions : BaseService {
+    fun getBalance(): Single<BigInteger>?
     fun signMessage(message: String?) : Single<SignResult>?
     fun signPersonalMessage(message: String?) : Single<SignResult>?
     fun signTransaction(

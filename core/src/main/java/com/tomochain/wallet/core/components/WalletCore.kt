@@ -59,15 +59,16 @@ class WalletCore {
         }
 
         private fun getInstance(address: String) : WalletCore?{
-            instance?.address = address
-            instance?.coreBlockChainService?.setWalletAddress(address)
-            instance?.signerService?.setWalletAddress(address)
-            instance?.tokenService?.setWalletAddress(address)
-            instance?.trc20TokenService?.setWalletAddress(address)
-            instance?.trc21TokenService?.setWalletAddress(address)
-            instance?.tokenManager?.setWalletAddress(address)
-            instance?.walletFunctions?.setWalletAddress(address)
-            instance?.walletSecretDataService?.setWalletAddress(address)
+            val fAddress = address.toLowerCase()
+            instance?.address = fAddress
+            instance?.coreBlockChainService?.setWalletAddress(fAddress)
+            instance?.signerService?.setWalletAddress(fAddress)
+            instance?.tokenService?.setWalletAddress(fAddress)
+            instance?.trc20TokenService?.setWalletAddress(fAddress)
+            instance?.trc21TokenService?.setWalletAddress(fAddress)
+            instance?.tokenManager?.setWalletAddress(fAddress)
+            instance?.walletFunctions?.setWalletAddress(fAddress)
+            instance?.walletSecretDataService?.setWalletAddress(fAddress)
             return instance
         }
 
@@ -88,8 +89,9 @@ class WalletCore {
             return getInstance(walletAddress)?.walletFunctions
         }
 
-        fun getTokenManager(walletAddress: String, tokenAddress: String?) : TokenManagerService?{
-            return getInstance(walletAddress)?.tokenManager?.withTokenAddress(tokenAddress)
+        fun getTokenManager(walletAddress: String, tokenAddress: String? = null) : TokenManagerService?{
+            val t = getInstance(walletAddress)?.tokenManager
+            return if (tokenAddress == null) t else t?.withTokenAddress(tokenAddress)
         }
 
         fun getWalletSecretData(walletAddress: String) : WalletSecretDataService?{

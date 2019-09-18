@@ -42,14 +42,15 @@ class Habak19Cipher(private val alias : String, private val context: Context) : 
         })
     }
 
-    override fun encrypt(plainText: String): EncryptedModel {
+    override fun encrypt(plainText: String): String {
         val encryptedData = encryptionManager.encrypt(plainText)!!.toByteArray()
-        return EncryptedModel(encryptedData!!, byteArrayOf(0), Calendar.getInstance().timeInMillis)
+        return EncryptedModel(encryptedData!!, byteArrayOf(0), Calendar.getInstance().timeInMillis).writeToString()
     }
 
-    override fun decrypt(data: EncryptedModel): StringBuilder {
+    override fun decrypt(data: String): StringBuilder {
         return try {
-            StringBuilder(encryptionManager.decrypt(String(data.getEncryptedData().first!!))!!)
+            val encryptedModel = EncryptedModel.readFromString(data)
+            StringBuilder(encryptionManager.decrypt(String(encryptedModel.getEncryptedData().first!!))!!)
         } catch (e: Exception) {
             StringBuilder()
         }

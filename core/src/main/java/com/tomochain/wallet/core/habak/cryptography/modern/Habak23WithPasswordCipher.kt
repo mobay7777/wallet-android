@@ -9,6 +9,8 @@ import com.tomochain.wallet.core.habak.Constant
 import com.tomochain.wallet.core.habak.EncryptedModel
 import com.tomochain.wallet.core.habak.cryptography.Habak
 import java.lang.StringBuilder
+import java.nio.ByteBuffer
+import java.nio.charset.Charset
 import java.security.Key
 import java.security.KeyStore
 import java.util.*
@@ -78,16 +80,16 @@ class Habak23WithPasswordCipher(private val alias : String, private val password
      * @return EncryptedModel object contain the encrypted data, zero-length IV
      * and the current timeStamp
      */
-    override fun encrypt(plainText: String): EncryptedModel {
+    override fun encrypt(plainText: String): String {
         return try {
             val cipher = Cipher.getInstance(Constant.AES_MODE_FROM_M)
             cipher.init(Cipher.ENCRYPT_MODE, getSecretKey(),
                     GCMParameterSpec(128, formatPasswordLength().toByteArray()))
             val encrypted = cipher.doFinal(plainText.toByteArray(charset(Constant.UTF8)))
             val now = Calendar.getInstance().timeInMillis
-            return EncryptedModel(encrypted, ByteArray(0), now)
+            return EncryptedModel(encrypted, ByteArray(0), now).writeToString()
         } catch (e: Exception) {
-            EncryptedModel(ByteArray(0), ByteArray(0), 0)
+            EncryptedModel(ByteArray(0), ByteArray(0), 0).writeToString()
         }
     }
 
@@ -97,28 +99,30 @@ class Habak23WithPasswordCipher(private val alias : String, private val password
      * @return decrypted plain string
      * and the current timeStamp
      */
-    /*override fun decrypt(data: EncryptedModel): StringBuilder {
+    override fun decrypt(data: String): StringBuilder {
         return try {
             val cipher = Cipher.getInstance(Constant.AES_MODE_FROM_M)
-            val spec = GCMParameterSpec(128, data.iv)
+            val encryptedModel = EncryptedModel.readFromString(data)
+            val spec = GCMParameterSpec(128, formatPasswordLength().toByteArray())
             cipher.init(Cipher.DECRYPT_MODE, getSecretKey(), spec)
-            *//*val r = String(cipher.doFinal(data.data), Charsets.UTF_8)
-            return r*//*
+            /*val r = String(cipher.doFinal(data.data), Charsets.UTF_8)
+            return r*/
 
-            val sb = StringBuilder()
-            cipher.doFinal(data.data).forEach {
+            val charset = Charset.forName("UTF-8")
+            val decoder = charset.newDecoder()
+            val srcBuffer = ByteBuffer.wrap(cipher.doFinal(encryptedModel.getEncryptedData().first))
+
+
+            val sb = StringBuilder(decoder.decode(srcBuffer))
+            /*cipher.doFinal(data.data).forEach {
                 sb.append(it.toChar())
-            }
+            }*/
+            srcBuffer.clear()
             sb
         } catch (e: Exception) {
             Log.e("HABAK","decrypt: ", e)
             StringBuilder()
         }
-    }*/
-
-
-    override fun decrypt(data: EncryptedModel): StringBuilder {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     /**

@@ -22,9 +22,9 @@ class WalletFunctionsImpl(private val blockChainService: BlockChainService?,
     private var walletAddress: String? = ""
 
     override fun setWalletAddress(address: String?) {
-        this.walletAddress = address
-        blockChainService?.setWalletAddress(address)
-        signerService?.setWalletAddress(address)
+        this.walletAddress = address?.toLowerCase()
+        blockChainService?.setWalletAddress(this.walletAddress)
+        signerService?.setWalletAddress(this.walletAddress)
     }
 
     override fun signMessage(message: String?) : Single<SignResult>?{

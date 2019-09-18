@@ -1,5 +1,6 @@
 package com.tomochain.wallet.core.components
 
+import com.tomochain.wallet.core.habak.cryptography.Habak
 import com.tomochain.wallet.core.w3jl.config.chain.Chain
 
 /**
@@ -13,4 +14,5 @@ abstract class CoreConfig {
     abstract fun chain() : Chain
     abstract fun habakAlias() : String
     abstract fun roomHelperSalt() : String
+    abstract fun cryptographyManager() : Habak?
 }

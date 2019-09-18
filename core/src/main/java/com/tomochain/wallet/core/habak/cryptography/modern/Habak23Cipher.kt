@@ -74,17 +74,17 @@ class Habak23Cipher(private val alias : String) : Habak {
      * @return EncryptedModel object contain the encrypted data, the IV
      * and the current timeStamp
      */
-    override fun encrypt(plainText: String): EncryptedModel {
+    override fun encrypt(plainText: String): String {
         return try {
             val cipher = Cipher.getInstance(Constant.AES_MODE_FROM_M)
             cipher.init(Cipher.ENCRYPT_MODE, getSecretKey())
             val iv = cipher.iv
             val encrypted = cipher.doFinal(plainText.toByteArray(Charsets.UTF_8))
             val now = Calendar.getInstance().timeInMillis
-            return EncryptedModel(encrypted, iv, now)
+            return EncryptedModel(encrypted, iv, now).writeToString()
         } catch (e: Exception) {
             Log.e("HABAK","decrypt: ", e)
-            EncryptedModel(ByteArray(0), ByteArray(0), 0)
+            EncryptedModel(ByteArray(0), ByteArray(0), 0).writeToString()
         }
     }
 
@@ -94,17 +94,18 @@ class Habak23Cipher(private val alias : String) : Habak {
      * @return decrypted plain string
      * and the current timeStamp
      */
-    override fun decrypt(data: EncryptedModel): StringBuilder {
+    override fun decrypt(data: String): StringBuilder {
         return try {
             val cipher = Cipher.getInstance(Constant.AES_MODE_FROM_M)
-            val spec = GCMParameterSpec(128, data.getEncryptedData().second)
+            val encryptedModel = EncryptedModel.readFromString(data)
+            val spec = GCMParameterSpec(128, encryptedModel.getEncryptedData().second)
             cipher.init(Cipher.DECRYPT_MODE, getSecretKey(), spec)
             /*val r = String(cipher.doFinal(data.data), Charsets.UTF_8)
             return r*/
 
             val charset = Charset.forName("UTF-8")
             val decoder = charset.newDecoder()
-            val srcBuffer = ByteBuffer.wrap(cipher.doFinal(data.getEncryptedData().first))
+            val srcBuffer = ByteBuffer.wrap(cipher.doFinal(encryptedModel.getEncryptedData().first))
 
 
             val sb = StringBuilder(decoder.decode(srcBuffer))

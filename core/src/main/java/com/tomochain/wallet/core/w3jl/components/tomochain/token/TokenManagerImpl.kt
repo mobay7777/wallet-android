@@ -39,10 +39,10 @@ class TokenManagerImpl(private val tokenService: TokenService?,
     }
 
     override fun setWalletAddress(address: String?) {
-        this.address = address
-        this.tokenService?.setWalletAddress(address)
-        this.tRC20Service?.setWalletAddress(address)
-        this.tRC21Service?.setWalletAddress(address)
+        this.address = address?.toLowerCase()
+        this.tokenService?.setWalletAddress(this.address)
+        this.tRC20Service?.setWalletAddress(this.address)
+        this.tRC21Service?.setWalletAddress(this.address)
     }
 
     override fun getToken() : TokenInfo{

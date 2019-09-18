@@ -12,6 +12,7 @@ import com.tomochain.wallet.core.common.exception.InvalidMnemonicException
 import com.tomochain.wallet.core.common.exception.InvalidPrivateKeyException
 import com.tomochain.wallet.core.common.exception.WalletAlreadyExistedException
 import com.tomochain.wallet.core.habak.EncryptedModel
+import com.tomochain.wallet.core.habak.cryptography.Habak
 import com.tomochain.wallet.core.w3jl.components.tomochain.token.TokenInfo
 import com.tomochain.wallet.core.w3jl.config.chain.Chain
 import com.tomochain.wallet.core.w3jl.config.chain.CommonChain
@@ -56,6 +57,10 @@ internal class WalletCoreTest {
 
             override fun roomHelperSalt(): String {
                 return Settings.Secure.ANDROID_ID
+            }
+
+            override fun cryptographyManager(): Habak? {
+                return null
             }
         })
     }
@@ -192,6 +197,19 @@ internal class WalletCoreTest {
                     Log.d(LOG, "getTokenTransferFee Not token > success: $it")
                 },{
                     Log.e(LOG, "getTokenTransferFee Not token > fail: " + it.localizedMessage)
+                }
+            )
+
+
+        WalletCore.getTokenManager("0x06605b28aab9835be75ca242a8ae58f2e15f2f45")
+            ?.getTRC20Services()
+            ?.estimateTokenTransferGasLimit("0x27b34cd1615014e4ff8a2255f2969f65634f57fc",
+                "0x6e7312d1028b70771bb9cdd9837442230a9349ca", BigInteger.ZERO)
+            ?.subscribe(
+                {
+                    Log.d(LOG, "getTRC20Services > getTokenTransferFee > success: $it")
+                },{
+                    Log.e(LOG, "getTRC20Services > getTokenTransferFee > fail: " + it.localizedMessage)
                 }
             )
 

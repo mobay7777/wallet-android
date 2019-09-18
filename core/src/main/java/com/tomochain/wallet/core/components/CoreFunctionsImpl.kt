@@ -76,7 +76,7 @@ class CoreFunctionsImpl(private val dao: DatabaseWalletSecret?,
                 }
 
                 if (!WalletUtil.isValidPrivateKey(privateKey)){
-                    emitter.onError(InvalidMnemonicException())
+                    emitter.onError(InvalidPrivateKeyException())
                     return@create
                 }
                 val entityWalletKey = walletService.importWalletFromPrivateKey(privateKey!!)?.blockingGet()
@@ -189,7 +189,7 @@ class CoreFunctionsImpl(private val dao: DatabaseWalletSecret?,
                     emitter.onError(InvalidAddressException())
                     return@create
                 }
-                dao.walletDAO().getWallet(address!!).subscribe(
+                dao.walletDAO().getWallet(address!!.toLowerCase()).subscribe(
                     { wallet ->
                         wallet?.clearContent()
                         emitter.onSuccess(wallet!!)

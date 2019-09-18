@@ -21,7 +21,7 @@ class WalletSecretDataImpl(private val  habak: Habak?,
     private var walletAddress: String? = ""
 
     override fun setWalletAddress(address: String?) {
-        this.walletAddress = address
+        this.walletAddress = address?.toLowerCase()
     }
 
     override fun getPrivateKey(): Single<StringBuilder> {
@@ -40,8 +40,7 @@ class WalletSecretDataImpl(private val  habak: Habak?,
                         if (wallet == null){
                             emitter.onSuccess(StringBuilder(""))
                         }else{
-                            val e = EncryptedModel.readFromString(wallet.encryptedPKey)
-                            emitter.onSuccess(habak.decrypt(e))
+                            emitter.onSuccess(habak.decrypt(wallet.encryptedPKey))
                         }
 
                     },{
@@ -70,8 +69,7 @@ class WalletSecretDataImpl(private val  habak: Habak?,
                         if (wallet == null){
                             emitter.onSuccess(StringBuilder(""))
                         }else{
-                            val e = EncryptedModel.readFromString(wallet.encryptedSeed)
-                            emitter.onSuccess(habak.decrypt(e))
+                            emitter.onSuccess(habak.decrypt(wallet.encryptedSeed))
                         }
 
                     },{

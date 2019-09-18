@@ -1,6 +1,7 @@
 package com.tomochain.wallet.core.components
 
 import android.provider.Settings
+import com.tomochain.wallet.core.habak.cryptography.Habak
 import com.tomochain.wallet.core.w3jl.config.chain.Chain
 import com.tomochain.wallet.core.w3jl.config.chain.CommonChain
 
@@ -17,10 +18,14 @@ class DefaultConfig : CoreConfig() {
     }
 
     override fun habakAlias(): String {
-        return Settings.Secure.ANDROID_ID
+        return "habakAlias"
     }
 
     override fun roomHelperSalt(): String {
-        return Settings.Secure.ANDROID_ID
+        return "roomHelperSalt"
+    }
+
+    override fun cryptographyManager(): Habak? {
+        return null
     }
 }

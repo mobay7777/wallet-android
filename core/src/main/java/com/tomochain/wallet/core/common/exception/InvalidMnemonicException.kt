@@ -6,4 +6,4 @@ package com.tomochain.wallet.core.common.exception
  * Ping me at nienbkict@gmail.com
  * Happy coding ^_^
  */
-class InvalidMnemonicException : Exception()
+class InvalidMnemonicException : Exception("The mnemonics is not correct!")

@@ -6,4 +6,4 @@ package com.tomochain.wallet.core.common.exception
  * Ping me at nienbkict@gmail.com
  * Happy coding ^_^
  */
-class InvalidPrivateKeyException : Exception()
+class InvalidPrivateKeyException : Exception("The private key is not correct!")

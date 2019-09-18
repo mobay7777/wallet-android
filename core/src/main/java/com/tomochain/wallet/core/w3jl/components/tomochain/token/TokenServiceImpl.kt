@@ -184,7 +184,7 @@ open class TokenServiceImpl(open var address: String?,
     }
 
     override fun setWalletAddress(address: String?) {
-        this.address = address
+        this.address = address?.toLowerCase()
     }
 
 

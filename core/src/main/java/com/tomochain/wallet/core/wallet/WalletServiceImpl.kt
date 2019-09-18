@@ -66,11 +66,11 @@ class WalletServiceImpl(private val habak: Habak?) : WalletService {
                 val key = chain.getKeyByPath(keyPath, true)
                 val c = Credentials.create(key.privateKeyAsHex)
                 val wallet = EntityWalletSecret(
-                    c.address,
+                    c.address.toLowerCase(),
                     Calendar.getInstance().timeInMillis,
                     WalletSourceType.MNEMONICS,
-                    habak?.encrypt(mnemonic)?.writeToString() ?: "",
-                    habak?.encrypt(key.privateKeyAsHex)?.writeToString() ?: "",
+                    habak?.encrypt(mnemonic.toLowerCase()) ?: "",
+                    habak?.encrypt(key.privateKeyAsHex.toLowerCase()) ?: "",
                     Config.Database.VERSION,
                     hdPath)
                 it.onSuccess(wallet)
@@ -90,11 +90,11 @@ class WalletServiceImpl(private val habak: Habak?) : WalletService {
                 val c = Credentials.create(privateKey)
 
                 val wallet = EntityWalletSecret(
-                    c.address,
+                    c.address.toLowerCase(),
                     Calendar.getInstance().timeInMillis,
                     WalletSourceType.PRIVATEKEY,
                     "",
-                    habak?.encrypt(privateKey)?.writeToString() ?: "",
+                    habak?.encrypt(privateKey.toLowerCase()) ?: "",
                     Config.Database.VERSION,
                     "")
                 it.onSuccess(wallet)
@@ -112,7 +112,7 @@ class WalletServiceImpl(private val habak: Habak?) : WalletService {
                     return@create
                 }
                 val wallet = EntityWalletSecret(
-                    address,
+                    address.toLowerCase(),
                     Calendar.getInstance().timeInMillis,
                     WalletSourceType.ADDRESS,
                     "",

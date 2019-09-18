@@ -37,8 +37,8 @@ class BlockChainServiceImpl(var address: String?,
                             private val web3j: Web3j?) : BlockChainService {
 
     override fun setWalletAddress(address: String?) {
-        this.address = address
-        this.walletSecretDataService?.setWalletAddress(address)
+        this.address = address?.toLowerCase()
+        this.walletSecretDataService?.setWalletAddress(this.address)
     }
 
 

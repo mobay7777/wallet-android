@@ -34,7 +34,7 @@ class CoreModule(var context: WeakReference<Context>,
     @Singleton
     @Provides
     fun getHaBak() : Habak {
-        return HabakFactory(context.get()).withAlias(config.habakAlias()).build()
+        return config.cryptographyManager() ?: HabakFactory(context.get()).withAlias(config.habakAlias()).build()
     }
 
     @Singleton

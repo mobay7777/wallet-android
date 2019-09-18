@@ -26,8 +26,8 @@ class SignerServiceImpl(var address: String?,
                         private val walletSecretDataService: WalletSecretDataService?,
                         private val web3j: Web3j?) : SignerService {
     override fun setWalletAddress(address: String?) {
-        this.address = address
-        this.walletSecretDataService?.setWalletAddress(address)
+        this.address = address?.toLowerCase()
+        this.walletSecretDataService?.setWalletAddress(this.address)
     }
 
     override fun signRawMessage(message: String?): Single<SignResult>? {

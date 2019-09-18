@@ -12,6 +12,6 @@ import com.tomochain.wallet.core.habak.EncryptedModel
 interface Habak{
 
     fun initialize()
-    fun encrypt(plainText: String) : EncryptedModel
-    fun decrypt(data: EncryptedModel) : StringBuilder
+    fun encrypt(plainText: String) : String
+    fun decrypt(data: String) : StringBuilder
 }

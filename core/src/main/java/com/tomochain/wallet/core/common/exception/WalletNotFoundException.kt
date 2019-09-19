@@ -6,4 +6,4 @@ package com.tomochain.wallet.core.common.exception
  * Ping me at nienbkict@gmail.com
  * Happy coding ^_^
  */
-class WalletNotFoundException : Exception()
+class WalletNotFoundException : Exception("Can not find wallet from database.")

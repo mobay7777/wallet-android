@@ -1,7 +1,9 @@
 package com.tomochain.wallet.core.w3jl.components.tomochain.token
 
 import com.tomochain.wallet.core.common.Config
+import com.tomochain.wallet.core.w3jl.entity.TransactionResult
 import com.tomochain.wallet.core.w3jl.listeners.TransactionListener
+import io.reactivex.Observable
 import io.reactivex.Single
 import java.math.BigInteger
 
@@ -17,10 +19,9 @@ interface TRC21Service : TokenService {
             tokenAddress: String,
             recipient: String,
             amount: BigInteger,
-            callback: TransactionListener?,
             gasPrice: BigInteger? = BigInteger(Config.Transaction.DEFAULT_GAS_PRICE),
             gasLimit: BigInteger? = null
-    )
+    ): Observable<TransactionResult>
 
     fun isTRC21Token(tokenAddress: String) : Single<Boolean>
     fun getTokenTransferFee(tokenAddress: String): Single<BigInteger>

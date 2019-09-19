@@ -1,10 +1,11 @@
 package com.tomochain.wallet.core.components
 
-import com.tomochain.wallet.core.common.Config
 import com.tomochain.wallet.core.w3jl.components.coreBlockchain.BlockChainService
-import com.tomochain.wallet.core.w3jl.components.signer.SignResult
+import com.tomochain.wallet.core.w3jl.entity.SignResult
 import com.tomochain.wallet.core.w3jl.components.signer.SignerService
+import com.tomochain.wallet.core.w3jl.entity.TransactionResult
 import com.tomochain.wallet.core.w3jl.listeners.TransactionListener
+import io.reactivex.Observable
 import io.reactivex.Single
 import java.math.BigInteger
 
@@ -45,8 +46,8 @@ class WalletFunctionsImpl(private val blockChainService: BlockChainService?,
         return signerService?.signTransaction(recipient, amount, gasPrice, gasLimit, payload)
     }
 
-    override fun sendSignedTransaction(signedTransaction: String?, callback: TransactionListener?){
-        blockChainService?.sendSignedTransaction(signedTransaction, callback)
+    override fun sendSignedTransaction(signedTransaction: String?): Observable<TransactionResult>?{
+        return blockChainService?.sendSignedTransaction(signedTransaction)
     }
 
 
@@ -55,10 +56,9 @@ class WalletFunctionsImpl(private val blockChainService: BlockChainService?,
         amount: BigInteger?,
         payload: String?,
         gasPrice: BigInteger?,
-        gasLimit: BigInteger?,
-        callback: TransactionListener?
-    ){
-        blockChainService?.transfer(recipient, amount, payload, gasPrice, gasLimit, callback)
+        gasLimit: BigInteger?
+    ) : Observable<TransactionResult>?{
+        return blockChainService?.transfer(recipient, amount, payload, gasPrice, gasLimit)
     }
 
     override fun getBalance(): Single<BigInteger>? {

@@ -3,9 +3,11 @@ package com.tomochain.wallet.core.w3jl.components.tomochain.token
 import android.annotation.SuppressLint
 import com.tomochain.wallet.core.common.Config
 import com.tomochain.wallet.core.common.exception.InvalidAmountException
+import com.tomochain.wallet.core.w3jl.entity.TransactionResult
 import com.tomochain.wallet.core.w3jl.listeners.TransactionListener
 import com.tomochain.wallet.core.w3jl.utils.ConvertUtil
 import io.reactivex.Flowable
+import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.functions.BiFunction
 import java.math.BigDecimal
@@ -154,15 +156,14 @@ class TokenManagerImpl(private val tokenService: TokenService?,
     @SuppressLint("CheckResult")
     override fun transferToken(recipient: String,
                                amount: BigInteger,
-                               callback: TransactionListener?,
                                gasPrice: BigInteger?,
-                               gasLimit: BigInteger?){
-        tRC21Service?.isTRC21Token(tokenAddress!!)
-            ?.subscribe { isTRC21 ->
+                               gasLimit: BigInteger?) : Observable<TransactionResult>? {
+        return  tRC21Service?.isTRC21Token(tokenAddress!!)
+            ?.flatMapObservable { isTRC21 ->
                 if (isTRC21){
-                    tRC21Service?.transferToken(tokenAddress!!, recipient, amount, callback, gasPrice, gasLimit)
+                    tRC21Service.transferToken(tokenAddress!!, recipient, amount, gasPrice, gasLimit)
                 }else{
-                    tRC20Service?.transferToken(tokenAddress!!, recipient, amount, callback, gasPrice, gasLimit)
+                    tRC20Service?.transferToken(tokenAddress!!, recipient, amount, gasPrice, gasLimit)
                 }
             }
     }
@@ -171,26 +172,16 @@ class TokenManagerImpl(private val tokenService: TokenService?,
     @SuppressLint("CheckResult")
     override fun transferFormattedToken(recipient: String,
                                         amount: BigDecimal,
-                                        callback: TransactionListener?,
                                         gasPrice: BigInteger?,
-                                        gasLimit: BigInteger?){
-        tRC21Service?.isTRC21Token(tokenAddress!!)
-            ?.subscribe { isTRC21 ->
-                val amountToken = amount.multiply(BigDecimal.TEN.pow(getToken().decimal))
-                if (amountToken.stripTrailingZeros().scale() > 0){
-                    callback?.onTransactionError(InvalidAmountException(
-                        "The token has ${getToken().decimal} decimals, which mean the amount must has no more than ${getToken().decimal} fractional numbers"
-                    ))
-                    return@subscribe
-                }
-                if (isTRC21){
-                    tRC21Service?.transferToken(tokenAddress!!, recipient, amount.multiply(
-                        BigDecimal.TEN.pow(getToken().decimal)).toBigInteger(), callback, gasPrice, gasLimit)
-                }else{
-                    tRC20Service?.transferToken(tokenAddress!!, recipient, amount.multiply(
-                        BigDecimal.TEN.pow(getToken().decimal)).toBigInteger(), callback, gasPrice, gasLimit)
-                }
-            }
+                                        gasLimit: BigInteger?) : Observable<TransactionResult>?{
+        val amountToken = amount.multiply(BigDecimal.TEN.pow(getToken().decimal))
+        return if (amountToken.stripTrailingZeros().scale() > 0){
+            Observable.error(InvalidAmountException(
+                "The token has ${getToken().decimal} decimals, which mean the amount must has no more than ${getToken().decimal} fractional numbers"
+            ))
+        }else{
+            transferToken(recipient,amount.toBigInteger(), gasPrice, gasLimit)
+        }
     }
 
     override fun getTRC20Services(): TRC20Service? {

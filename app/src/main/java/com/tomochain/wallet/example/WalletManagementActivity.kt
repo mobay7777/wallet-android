@@ -11,9 +11,11 @@ import com.afollestad.materialdialogs.input.input
 import com.tomochain.wallet.core.components.WalletCore
 import com.tomochain.wallet.core.room.walletSecret.EntityWalletSecret
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_wallet_management.*
 import kotlinx.android.synthetic.main.item_wallet_list.view.*
+import java.lang.StringBuilder
 
 class WalletManagementActivity : AppCompatActivity() {
 
@@ -112,8 +114,39 @@ class WalletManagementActivity : AppCompatActivity() {
             view.btnDelete.setOnClickListener {_ ->
                 deleteWallet(it.address)
             }
+            view.btnShowData.setOnClickListener {_ ->
+                showData(it.address)
+            }
             containerWalletList.addView(view)
         }
+    }
+
+    @SuppressLint("CheckResult")
+    private fun showData(address: String) {
+        /*coreFunctions?.removeWallet(address)
+            ?.subscribeOn(Schedulers.io())
+            ?.observeOn(AndroidSchedulers.mainThread())
+            ?.subscribe({
+                displayWalletList()
+            },{
+                Toast.makeText(this@WalletManagementActivity, it.localizedMessage, Toast.LENGTH_SHORT).show()
+            })*/
+        WalletCore.getWalletSecretData(address)
+            ?.getPrivateKey()
+            ?.zipWith(
+                WalletCore.getWalletSecretData(address)?.getMnemonics(),
+                BiFunction<StringBuilder, StringBuilder, String> { t1, t2 -> "pkey:[$t1]\nmnemonics:[$t2]" })
+            ?.subscribeOn(Schedulers.io())
+            ?.observeOn(AndroidSchedulers.mainThread())
+            ?.subscribe({
+                MaterialDialog(this).show {
+                    message(text = it)
+                    negativeButton (text = "close")
+                }
+            },{
+                Toast.makeText(this@WalletManagementActivity, it.localizedMessage, Toast.LENGTH_SHORT).show()
+            })
+
     }
 
 

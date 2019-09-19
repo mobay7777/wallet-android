@@ -3,8 +3,10 @@ package com.tomochain.wallet.core.w3jl.components.tomochain.token
 import android.annotation.SuppressLint
 import com.tomochain.wallet.core.common.BaseService
 import com.tomochain.wallet.core.common.Config
+import com.tomochain.wallet.core.w3jl.entity.TransactionResult
 import com.tomochain.wallet.core.w3jl.listeners.TransactionListener
 import io.reactivex.Flowable
+import io.reactivex.Observable
 import io.reactivex.Single
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -36,16 +38,14 @@ interface TokenManagerService : BaseService{
     @SuppressLint("CheckResult")
     fun transferToken(recipient: String,
                       amount: BigInteger,
-                      callback: TransactionListener?,
                       gasPrice: BigInteger? = BigInteger(Config.Transaction.DEFAULT_GAS_PRICE),
-                      gasLimit: BigInteger? = null)
+                      gasLimit: BigInteger? = null) : Observable<TransactionResult>?
 
     @SuppressLint("CheckResult")
     fun transferFormattedToken(recipient: String,
                                amount: BigDecimal,
-                               callback: TransactionListener?,
                                gasPrice: BigInteger? = BigInteger(Config.Transaction.DEFAULT_GAS_PRICE),
-                               gasLimit: BigInteger? = null)
+                               gasLimit: BigInteger? = null) : Observable<TransactionResult>?
 
     fun getTRC20Services() : TRC20Service?
     fun getTRC21Services() : TRC21Service?

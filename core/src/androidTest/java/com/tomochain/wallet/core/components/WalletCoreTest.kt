@@ -111,7 +111,7 @@ internal class WalletCoreTest {
                 }
             )
 
-        WalletCore.getWalletFunctions("0x06605b28aab9835be75ca242a8ae58f2e15f2f45")
+        /*WalletCore.getWalletFunctions("0x06605b28aab9835be75ca242a8ae58f2e15f2f45")
             ?.sendSignedTransaction("0xf87081b3840ee6b2808252089406605b28aab9835be75ca242a8ae58f2e15f2f458579ecc8e6bc870aefeffceffcef1ca0a5730e68d6a6d64e5627f919f700de70944fc87a96d65bccc33d0d7aec855c08a023dfd687c1554e258bf3cc45cd6e6d02a49807969ab950d1840681f64e1315a8",
                 callback =  object : TransactionListener{
                     override fun onTransactionCreated(txId: String) {
@@ -125,7 +125,7 @@ internal class WalletCoreTest {
                     override fun onTransactionError(e: Exception) {
                         Log.d(LOG, "sendSignedTransaction > onTransactionError: $e")
                     }
-                })
+                })*/
 
 
 

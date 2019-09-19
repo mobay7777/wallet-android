@@ -2,6 +2,7 @@ package com.tomochain.wallet.core.w3jl.components.signer
 
 import com.tomochain.wallet.core.common.BaseService
 import com.tomochain.wallet.core.common.Config
+import com.tomochain.wallet.core.w3jl.entity.SignResult
 import io.reactivex.Single
 import java.math.BigInteger
 

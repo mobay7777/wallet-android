@@ -6,11 +6,14 @@ import com.tomochain.wallet.core.common.Config
 import com.tomochain.wallet.core.common.LogTag
 import com.tomochain.wallet.core.common.exception.InsufficientBalanceException
 import com.tomochain.wallet.core.common.exception.InvalidAddressException
+import com.tomochain.wallet.core.common.exception.InvalidPrivateKeyException
 import com.tomochain.wallet.core.common.exception.WalletNotFoundException
 import com.tomochain.wallet.core.components.CoreFunctions
 import com.tomochain.wallet.core.habak.EncryptedModel
 import com.tomochain.wallet.core.habak.cryptography.Habak
 import com.tomochain.wallet.core.room.walletSecret.WalletSecretDAO
+import com.tomochain.wallet.core.w3jl.entity.TransactionResult
+import com.tomochain.wallet.core.w3jl.entity.TransactionStatus
 import com.tomochain.wallet.core.w3jl.listeners.TransactionListener
 import com.tomochain.wallet.core.w3jl.utils.WalletUtil
 import com.tomochain.wallet.core.wallet.WalletSecretDataService
@@ -49,21 +52,25 @@ class BlockChainServiceImpl(var address: String?,
                     emitter.onError(InvalidAddressException())
                     return@create
                 }
-                val wallet = coreFunctions?.getWalletByAddress(address!!)?.blockingGet()
-                if(wallet == null){
-                    emitter.onError(WalletNotFoundException())
-                    return@create
-                }else{
-                    web3j?.ethGetBalance(wallet.address, DefaultBlockParameterName.LATEST)
-                        ?.flowable()
-                        ?.doOnError {
-                            emitter.onError(it)
-                        }
-                        ?.subscribe (
-                            {e -> emitter.onSuccess(e.balance)} ,
-                            { t -> emitter.onError(t)}
-                        )
-                }
+                coreFunctions?.getWalletByAddress(address!!)
+                    ?.subscribe({wallet ->
+                        web3j?.ethGetBalance(wallet?.address, DefaultBlockParameterName.LATEST)
+                            ?.flowable()
+                            ?.doOnError {
+                                emitter.onError(it)
+                            }
+                            ?.subscribe (
+                                {e ->
+                                    emitter.onSuccess(e.balance)
+                                },
+                                {t ->
+                                    emitter.tryOnError(t)
+                                }
+                            )
+                    },{
+                        emitter.onError(WalletNotFoundException())
+                    })
+
             }catch (e : Exception){
                 //emitter.tryOnError(e)
                 Log.e(LogTag.TAG_W3JL,"CoreBlockChainServiceImpl > getAccountBalance: ${e.localizedMessage}")
@@ -79,21 +86,20 @@ class BlockChainServiceImpl(var address: String?,
                     emitter.onError(InvalidAddressException())
                     return@create
                 }
-                val wallet =  coreFunctions?.getWalletByAddress(address!!)?.blockingGet()
-                if(wallet == null){
-                    emitter.onError(WalletNotFoundException())
-                    return@create
-                }else{
-                    web3j?.ethGetTransactionCount(wallet.address, DefaultBlockParameterName.LATEST)
-                        ?.flowable()
-                        ?.doOnError {
-                            emitter.onError(it)
-                        }
-                        ?.subscribe (
-                            {e -> emitter.onSuccess(e.transactionCount)} ,
-                            { t -> emitter.onError(t)}
-                        )
-                }
+                coreFunctions?.getWalletByAddress(address!!)
+                    ?.subscribe({wallet ->
+                        web3j?.ethGetTransactionCount(wallet?.address, DefaultBlockParameterName.LATEST)
+                            ?.flowable()
+                            ?.doOnError {
+                                emitter.onError(it)
+                            }
+                            ?.subscribe (
+                                {e -> emitter.onSuccess(e.transactionCount)} ,
+                                { t -> emitter.onError(t)}
+                            )
+                    },{
+                        emitter.onError(WalletNotFoundException())
+                    })
             }catch (e : Exception){
                 //emitter.tryOnError(e)
                 Log.e(LogTag.TAG_W3JL,"CoreBlockChainServiceImpl > getTransactionCount: ${e.localizedMessage}")
@@ -102,157 +108,91 @@ class BlockChainServiceImpl(var address: String?,
         }
     }
 
-
     override fun transfer(
         recipient: String,
         amount: BigInteger?,
         payload: String?,
         gasPrice: BigInteger?,
         gasLimit: BigInteger?
-    ): Single<String> {
-        return Single.create { emitter ->
-            try{
-                if (!WalletUtil.isValidAddress(address)){
-                    emitter.onError(InvalidAddressException())
-                    return@create
-                }
-                val pKey =  walletSecretDataService?.getPrivateKey()?.blockingGet()
-                if(pKey == null || pKey.isEmpty()){
-                    emitter.onError(WalletNotFoundException())
-                    return@create
-                }
-
-                if (getAccountBalance().blockingGet() <= amount){
-                    emitter.onError(InsufficientBalanceException(""))
-                    return@create
-                }
-                val credentials = Credentials.create(pKey?.toString())
-                pKey.clear()
-                val realAmount = amount ?: BigInteger.ZERO
-                val from = credentials.address
-                val ethGetTransactionCount = web3j?.ethGetTransactionCount(
-                    from, DefaultBlockParameterName.LATEST)?.sendAsync()?.get()
-                val nonce = ethGetTransactionCount?.transactionCount
-                val exactGasLimit = if (gasLimit == null){
-                    if (payload.isNullOrEmpty()) BigInteger(Config.Transaction.DEFAULT_GAS_LIMIT) else
-                        BigInteger(Config.Transaction.DEFAULT_GAS_LIMIT_WITH_PAYLOAD)
-                }else{
-                    if (payload.isNullOrEmpty()) gasLimit else
-                        BigInteger(Config.Transaction.DEFAULT_GAS_LIMIT_WITH_PAYLOAD)
-                }
-
-                val rawTransaction = if (payload == null || payload.isEmpty()){
-                    RawTransaction.createEtherTransaction(
-                        nonce, gasPrice, exactGasLimit, recipient, realAmount)
-                }
-                else{
-                    RawTransaction.createTransaction(nonce, gasPrice, exactGasLimit, recipient, realAmount, payload)
-                }
-                val signedMessage = TransactionEncoder.signMessage(rawTransaction, credentials)
-                val signedMessageHex  = Numeric.toHexString(signedMessage)
-                web3j?.ethSendRawTransaction(signedMessageHex)?.flowable()
-                    ?.doOnError {
-                        emitter.onError(it)
-                    }
-                    ?.subscribe ({
-                            e -> emitter.onSuccess(e.transactionHash)
-                    } , {
-                            t -> emitter.onError(t)
-                    })
-
-            }catch(t: Throwable){
-                Log.e(LogTag.TAG_W3JL,"CoreBlockChainServiceImpl > transfer: ${t.localizedMessage}")
-                emitter.onError(t)
-            }
-        }
-    }
-
-
-    @SuppressLint("CheckResult")
-    override fun transfer(
-        recipient: String,
-        amount: BigInteger?,
-        payload: String?,
-        gasPrice: BigInteger?,
-        gasLimit: BigInteger?,
-        callback: TransactionListener?
-    ) {
-        try{
+    ): Observable<TransactionResult> {
+        return Observable.create {emitter ->
             if (!WalletUtil.isValidAddress(address)){
-                callback?.onTransactionError(InvalidAddressException())
-                return
+                emitter.onError(InvalidAddressException())
+                return@create
             }
             val pKey = walletSecretDataService?.getPrivateKey()?.blockingGet()
             if(pKey == null || pKey.isEmpty()){
-                callback?.onTransactionError(WalletNotFoundException())
-                return
-            }
-            if (getAccountBalance().blockingGet() <= amount){
-                callback?.onTransactionError(InsufficientBalanceException(""))
-                return
+                emitter.onError(WalletNotFoundException())
+                return@create
             }
 
-            val credentials = Credentials.create(pKey.toString())
-            pKey.clear()
-            val realAmount = amount ?: BigInteger.ZERO
-            val from = credentials.address
-            val ethGetTransactionCount = web3j?.ethGetTransactionCount(
-                from, DefaultBlockParameterName.LATEST)?.sendAsync()?.get()
-            val nonce = ethGetTransactionCount?.transactionCount
-
-            Log.e(LogTag.TAG_W3JL,"CoreBlockChainServiceImpl > transfer: $nonce")
-            val exactGasLimit = if (gasLimit == null){
-                if (payload.isNullOrEmpty()) BigInteger(Config.Transaction.DEFAULT_GAS_LIMIT) else
-                    BigInteger(Config.Transaction.DEFAULT_GAS_LIMIT_WITH_PAYLOAD)
-            }else{
-                if (payload.isNullOrEmpty()) gasLimit else
-                    BigInteger(Config.Transaction.DEFAULT_GAS_LIMIT_WITH_PAYLOAD)
-            }
-
-            val rawTransaction = if (payload == null || payload.isEmpty()){
-                RawTransaction.createEtherTransaction(
-                    nonce, gasPrice, exactGasLimit, recipient, realAmount)
-            }
-            else{
-                RawTransaction.createTransaction(nonce, gasPrice, exactGasLimit, recipient, realAmount, payload)
-            }
-            val signedMessage = TransactionEncoder.signMessage(rawTransaction, credentials)
-            val signedMessageHex  = Numeric.toHexString(signedMessage)
-
-            val transaction =web3j?.ethSendRawTransaction(signedMessageHex)?.send()
-            if (transaction != null && transaction.transactionHash != null){
-                callback?.onTransactionCreated(transaction.transactionHash)
-                web3j?.ethGetTransactionReceipt(transaction.transactionHash)
-                    ?.flowable()
-                    ?.toObservable()
-                    ?.repeat()
-                    ?.map { r ->
-                        r.result.status
+            getAccountBalance()
+                .subscribe({balance ->
+                    if (balance <= amount){
+                        emitter.onError(InsufficientBalanceException(""))
+                        return@subscribe
                     }
-                    ?.takeUntil {
-                        it.contains("0x", true)
-                    }
-                    ?.retry()
-                    ?.subscribe {
-                        callback?.onTransactionComplete(transaction.transactionHash, it)
-                    }
-            }else{
-                callback?.onTransactionError(IllegalStateException(transaction?.error?.message))
-            }
+                    val credentials = Credentials.create(pKey.toString())
+                    pKey.clear()
+                    val realAmount = amount ?: BigInteger.ZERO
+                    val from = credentials.address
+                    val ethGetTransactionCount = web3j?.ethGetTransactionCount(
+                        from, DefaultBlockParameterName.LATEST)?.sendAsync()?.get()
+                    val nonce = ethGetTransactionCount?.transactionCount
 
-        }catch(t: Throwable){
-            Log.e(LogTag.TAG_W3JL,"CoreBlockChainServiceImpl > transfer: ${t.localizedMessage}")
-            callback?.onTransactionError(t as Exception)
+                    Log.e(LogTag.TAG_W3JL,"CoreBlockChainServiceImpl > transfer: $nonce")
+                    val exactGasLimit = if (gasLimit == null){
+                        if (payload.isNullOrEmpty()) BigInteger(Config.Transaction.DEFAULT_GAS_LIMIT) else
+                            BigInteger(Config.Transaction.DEFAULT_GAS_LIMIT_WITH_PAYLOAD)
+                    }else{
+                        if (payload.isNullOrEmpty()) gasLimit else
+                            BigInteger(Config.Transaction.DEFAULT_GAS_LIMIT_WITH_PAYLOAD)
+                    }
+
+                    val rawTransaction = if (payload == null || payload.isEmpty()){
+                        RawTransaction.createEtherTransaction(nonce, gasPrice, exactGasLimit, recipient, realAmount)
+                    }
+                    else{
+                        RawTransaction.createTransaction(nonce, gasPrice, exactGasLimit, recipient, realAmount, payload)
+                    }
+                    val signedMessage = TransactionEncoder.signMessage(rawTransaction, credentials)
+                    val signedMessageHex  = Numeric.toHexString(signedMessage)
+
+                    val transaction =web3j?.ethSendRawTransaction(signedMessageHex)?.send()
+                    if (transaction != null && transaction.transactionHash != null){
+                        emitter.onNext(TransactionResult(transaction.transactionHash, TransactionStatus.PENDING))
+                        web3j?.ethGetTransactionReceipt(transaction.transactionHash)
+                            ?.flowable()
+                            ?.toObservable()
+                            ?.repeat()
+                            ?.map { r ->
+                                r.result.status
+                            }
+                            ?.takeUntil {
+                                it.contains("0x", true)
+                            }
+                            ?.retry()
+                            ?.subscribe {
+                                Log.d(LogTag.TAG_W3JL,"tx status: $it")
+                                emitter.onNext(TransactionResult(transaction.transactionHash, if (it == "0x1") TransactionStatus.SUCCESS
+                                else TransactionStatus.FAILED))
+                            }
+                    }else{
+                        emitter.onError(IllegalStateException(transaction?.error?.message))
+                    }
+                },{
+                    emitter.onError(it)
+                })
         }
     }
 
 
     @SuppressLint("CheckResult")
-    override fun sendSignedTransaction(signedTransaction: String?, callback: TransactionListener?) {
-        try{
+    override fun sendSignedTransaction(signedTransaction: String?) : Observable<TransactionResult>{
+        return Observable.create { emitter ->
             val transaction =web3j?.ethSendRawTransaction(signedTransaction)?.send()
             if (transaction != null && transaction.transactionHash != null){
-                callback?.onTransactionCreated(transaction.transactionHash)
+                emitter.onNext(TransactionResult(transaction.transactionHash, TransactionStatus.PENDING))
                 web3j?.ethGetTransactionReceipt(transaction.transactionHash)
                     ?.flowable()
                     ?.toObservable()
@@ -265,13 +205,13 @@ class BlockChainServiceImpl(var address: String?,
                     }
                     ?.retry()
                     ?.subscribe {
-                        callback?.onTransactionComplete(transaction.transactionHash, it)
+                        Log.d(LogTag.TAG_W3JL,"tx status: $it")
+                        emitter.onNext(TransactionResult(transaction.transactionHash, if (it == "0x1") TransactionStatus.SUCCESS
+                        else TransactionStatus.FAILED))
                     }
             }else{
-                callback?.onTransactionError(IllegalStateException(transaction?.error?.message))
+                emitter.onError(IllegalStateException(transaction?.error?.message))
             }
-        }catch(t: Throwable){
-            callback?.onTransactionError(t as Exception)
         }
     }
 

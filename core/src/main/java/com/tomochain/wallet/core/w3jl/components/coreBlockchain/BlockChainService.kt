@@ -2,6 +2,7 @@ package com.tomochain.wallet.core.w3jl.components.coreBlockchain
 
 import com.tomochain.wallet.core.common.BaseService
 import com.tomochain.wallet.core.common.Config
+import com.tomochain.wallet.core.w3jl.entity.TransactionResult
 import com.tomochain.wallet.core.w3jl.listeners.TransactionListener
 import io.reactivex.Flowable
 import io.reactivex.Observable
@@ -28,19 +29,9 @@ interface BlockChainService : BaseService {
         payload: String? = null,
         gasPrice: BigInteger? = BigInteger(Config.Transaction.DEFAULT_GAS_PRICE),
         gasLimit: BigInteger? = BigInteger(Config.Transaction.DEFAULT_GAS_LIMIT)
-    ): Single<String>
+    ) : Observable<TransactionResult>
 
-
-    fun transfer(
-        recipient: String,
-        amount: BigInteger?,
-        payload: String? = null,
-        gasPrice: BigInteger? = BigInteger(Config.Transaction.DEFAULT_GAS_PRICE),
-        gasLimit: BigInteger? = BigInteger(Config.Transaction.DEFAULT_GAS_LIMIT),
-        callback: TransactionListener?
-    )
-
-    fun sendSignedTransaction(signedTransaction: String?, callback: TransactionListener?)
+    fun sendSignedTransaction(signedTransaction: String?): Observable<TransactionResult>
 
 
 }

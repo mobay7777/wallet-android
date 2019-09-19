@@ -3,6 +3,7 @@ package com.tomochain.wallet.example
 import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.tomochain.wallet.core.components.WalletCore
@@ -75,23 +76,20 @@ class CoreFunctionActivity : AppCompatActivity() {
 
     @SuppressLint("CheckResult")
     fun transfer(view: View) {
+
         walletFunctions
             ?.transfer(
                 "0x6e7312d1028b70771bb9cdd9837442230a9349ca",
-                BigInteger.ONE,
-                callback = object : TransactionListener{
-                    override fun onTransactionCreated(txId: String) {
-                        addLog("transfer onTransactionCreated: $txId")
-                    }
-
-                    override fun onTransactionComplete(txId: String, status: String) {
-                        addLog("transfer onTransactionCreated: $txId - $status")
-                    }
-
-                    override fun onTransactionError(e: Exception) {
-                        addLog("transfer onTransactionError: $e")
-                    }
-                })
+                BigInteger.ONE
+            )
+            ?.subscribeOn(Schedulers.io())
+            ?.observeOn(AndroidSchedulers.mainThread())
+            ?.subscribe({
+                addLog("transfer success: $it")
+            },{
+                Toast.makeText(this, it.localizedMessage, Toast.LENGTH_SHORT).show()
+                addLog("transfer fail: $it")
+            })
     }
 
     @SuppressLint("CheckResult")
@@ -101,5 +99,6 @@ class CoreFunctionActivity : AppCompatActivity() {
 
     private fun addLog(log: String){
         txtOutput.text = "[${Calendar.getInstance().timeInMillis}]: $log\n${txtOutput.text}"
+        Log.d("addLog","[${Calendar.getInstance().timeInMillis}]: $log\n${txtOutput.text}")
     }
 }

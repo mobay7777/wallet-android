@@ -1,4 +1,4 @@
-package com.tomochain.wallet.core.w3jl.components.signer
+package com.tomochain.wallet.core.w3jl.entity
 
 /**
  * Created by cityme on 03,September,2019

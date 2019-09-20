@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".TokenActivity"
-    android:padding="12dp"
+    android:padding="4dp"
     android:orientation="vertical">
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,21 +15,25 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="balance"
-            android:onClick="checkBalance"/>
+            android:onClick="checkBalance"
+            android:textSize="12sp"/>
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="TRC20 Fee"
-            android:onClick="checkTRC20Fee"/>
+            android:onClick="checkTRC20Fee"
+            android:textSize="12sp"/>
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="TRC21 Fee"
-            android:onClick="checkTRC21Fee"/>
+            android:onClick="checkTRC21Fee"
+            android:textSize="12sp"/>
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="transfer"
+            android:text="send"
+            android:textSize="12sp"
             android:onClick="transfer"/>
     </LinearLayout>
     <LinearLayout
@@ -39,18 +43,27 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="transfer TRC20"
-            android:onClick="transferTRC20"/>
+            android:text="send TRC20"
+            android:onClick="transferTRC20"
+            android:textSize="12sp"/>
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="transfer TRC21"
-            android:onClick="transferTRC21"/>
+            android:text="send TRC21"
+            android:onClick="transferTRC21"
+            android:textSize="12sp"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="get info"
+            android:onClick="getTokenInfo"
+            android:textSize="12sp"/>
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="clear log"
+            android:text="clear"
+            android:textSize="12sp"
             android:onClick="clearOutput"/>
     </LinearLayout>
 

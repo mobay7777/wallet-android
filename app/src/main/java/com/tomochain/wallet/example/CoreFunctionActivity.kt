@@ -7,7 +7,6 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.tomochain.wallet.core.components.WalletCore
-import com.tomochain.wallet.core.w3jl.listeners.TransactionListener
 import com.tomochain.wallet.core.w3jl.utils.ConvertUtil
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers

@@ -37,7 +37,7 @@ class MainApplication : MultiDexApplication(){
             }
 
             override fun cryptographyManager(): Habak? {
-                return habak
+                return null
             }
         })
     }
@@ -48,18 +48,4 @@ class MainApplication : MultiDexApplication(){
         WalletCore.destroyInstance()
     }
 
-
-    val habak = object : Habak{
-        override fun initialize() {
-
-        }
-
-        override fun encrypt(plainText: String): String {
-            return "$plainText>>>>>>>>>"
-        }
-
-        override fun decrypt(data: String): StringBuilder {
-            return  StringBuilder(data.replace(">>>>>>>>>",""))
-        }
-    }
 }

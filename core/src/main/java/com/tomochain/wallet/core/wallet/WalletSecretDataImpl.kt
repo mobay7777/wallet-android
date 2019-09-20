@@ -1,5 +1,7 @@
 package com.tomochain.wallet.core.wallet
 
+import android.util.Log
+import com.tomochain.wallet.core.common.LogTag
 import com.tomochain.wallet.core.common.exception.InvalidAddressException
 import com.tomochain.wallet.core.common.exception.ServiceNotImplementException
 import com.tomochain.wallet.core.habak.EncryptedModel
@@ -37,6 +39,7 @@ class WalletSecretDataImpl(private val  habak: Habak?,
                 }
                 dao.walletDAO().getWallet(walletAddress!!).subscribe(
                     { wallet ->
+                        Log.d(LogTag.TAG_W3JL, "getPrivateKey: ${wallet?.encryptedPKey}")
                         if (wallet == null){
                             emitter.onSuccess(StringBuilder(""))
                         }else{
@@ -66,6 +69,7 @@ class WalletSecretDataImpl(private val  habak: Habak?,
                 }
                 dao.walletDAO().getWallet(walletAddress!!).subscribe(
                     { wallet ->
+                        Log.d(LogTag.TAG_W3JL, "getMnemonics: ${wallet?.encryptedSeed}")
                         if (wallet == null){
                             emitter.onSuccess(StringBuilder(""))
                         }else{

@@ -5,6 +5,7 @@ import android.os.Build
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Log
+import com.tomochain.wallet.core.common.LogTag
 import com.tomochain.wallet.core.habak.Constant
 import com.tomochain.wallet.core.habak.EncryptedModel
 import com.tomochain.wallet.core.habak.cryptography.Habak
@@ -81,9 +82,15 @@ class Habak23Cipher(private val alias : String) : Habak {
             val iv = cipher.iv
             val encrypted = cipher.doFinal(plainText.toByteArray(Charsets.UTF_8))
             val now = Calendar.getInstance().timeInMillis
-            return EncryptedModel(encrypted, iv, now).writeToString()
+            val e = EncryptedModel(encrypted, iv, now)
+            Log.d(LogTag.TAG_HABAK,"encrypt source: $plainText")
+            Log.d(LogTag.TAG_HABAK,"encrypt result: $e")
+            Log.d(LogTag.TAG_HABAK,"encrypt result: ${e.toByteArrayString()}")
+            Log.d(LogTag.TAG_HABAK,"encrypt result: ${e.writeToString()}")
+
+            return  e.writeToString()
         } catch (e: Exception) {
-            Log.e("HABAK","decrypt: ", e)
+            Log.e(LogTag.TAG_HABAK,"encrypt: ", e)
             EncryptedModel(ByteArray(0), ByteArray(0), 0).writeToString()
         }
     }

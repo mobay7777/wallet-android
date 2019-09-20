@@ -16,7 +16,6 @@ import com.tomochain.wallet.core.habak.cryptography.Habak
 import com.tomochain.wallet.core.w3jl.components.tomochain.token.TokenInfo
 import com.tomochain.wallet.core.w3jl.config.chain.Chain
 import com.tomochain.wallet.core.w3jl.config.chain.CommonChain
-import com.tomochain.wallet.core.w3jl.listeners.TransactionListener
 import com.tomochain.wallet.core.w3jl.utils.ConvertUtil
 import org.junit.After
 import org.junit.Before
@@ -146,7 +145,7 @@ internal class WalletCoreTest {
 
         WalletCore.getTokenManager("0x06605b28aab9835be75ca242a8ae58f2e15f2f45",
             "0x9afff1e2657e3b87b9ccc9cc9a3fc1ed2f177b8a")
-            ?.getTokenTransferFee("0x06605b28aab9835be75ca242a8ae58f2e15f2f45", BigInteger.TEN)
+            ?.getTokenTransferFee("0x06605b28aab9835be75ca242a8ae58f2e15f2f45")
             ?.subscribe(
                 {
                     Log.d(LOG, "getTokenTransferFee TRC21 TOMOZ Fee 1 > success: $it")
@@ -157,7 +156,7 @@ internal class WalletCoreTest {
 
         WalletCore.getTokenManager("0x06605b28aab9835be75ca242a8ae58f2e15f2f45",
             "0x93fcc8bf855aee8af15d9fd231b13907f9642599")
-            ?.getTokenTransferFee("0x06605b28aab9835be75ca242a8ae58f2e15f2f45", BigInteger.TEN)
+            ?.getTokenTransferFee("0x06605b28aab9835be75ca242a8ae58f2e15f2f45")
             ?.subscribe(
                 {
                     Log.d(LOG, "getTokenTransferFee TRC21 TOMOZ Fee 0.05 > success: $it")
@@ -168,7 +167,7 @@ internal class WalletCoreTest {
 
         WalletCore.getTokenManager("0x06605b28aab9835be75ca242a8ae58f2e15f2f45",
             "0xb38c1b54de4068d3c9c87ed447fdfa500954802b")
-            ?.getTokenTransferFee("0x06605b28aab9835be75ca242a8ae58f2e15f2f45", BigInteger.TEN)
+            ?.getTokenTransferFee("0x06605b28aab9835be75ca242a8ae58f2e15f2f45")
             ?.subscribe(
                 {
                     Log.d(LOG, "getTokenTransferFee TRC21 Fee 0 > success: $it")
@@ -179,7 +178,7 @@ internal class WalletCoreTest {
 
         WalletCore.getTokenManager("0x06605b28aab9835be75ca242a8ae58f2e15f2f45",
             "0x647115852d611312a363749a1892b307044838ca")
-            ?.getTokenTransferFee("0x06605b28aab9835be75ca242a8ae58f2e15f2f45", BigInteger.TEN)
+            ?.getTokenTransferFee("0x06605b28aab9835be75ca242a8ae58f2e15f2f45")
             ?.subscribe(
                 {
                     Log.d(LOG, "getTokenTransferFee TRC20 Fee 0 > success: $it")
@@ -191,7 +190,7 @@ internal class WalletCoreTest {
 
         WalletCore.getTokenManager("0x06605b28aab9835be75ca242a8ae58f2e15f2f45",
             "0x6e7312d1028b70771bb9cdd9837442230a9349ca")
-            ?.getTokenTransferFee("0x06605b28aab9835be75ca242a8ae58f2e15f2f45", BigInteger.TEN)
+            ?.getTokenTransferFee("0x06605b28aab9835be75ca242a8ae58f2e15f2f45")
             ?.subscribe(
                 {
                     Log.d(LOG, "getTokenTransferFee Not token > success: $it")

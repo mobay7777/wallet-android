@@ -11,4 +11,5 @@ package com.tomochain.wallet.core.common
 object LogTag {
 
     val TAG_W3JL = "WALLET_CORE > W3JL"
+    val TAG_HABAK = "WALLET_CORE > HABAK"
 }

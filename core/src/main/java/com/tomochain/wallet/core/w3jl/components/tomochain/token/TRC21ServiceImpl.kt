@@ -60,6 +60,7 @@ class TRC21ServiceImpl(override var address: String?,
                                gasLimit: BigInteger?) : Observable<TransactionResult> {
         return Observable.create { emitter ->
             try {
+                emitter.onNext(TransactionResult(null, TransactionStatus.CREATING))
                 if (!WalletUtil.isValidAddress(address) || !WalletUtil.isValidAddress(tokenAddress)){
                     emitter.onError(InvalidAddressException())
                     return@create
@@ -234,13 +235,17 @@ class TRC21ServiceImpl(override var address: String?,
 
             }))
         return Single.create{ emitter ->
-            val responseValue =
-                callSmartContractFunction(function, tokenAddress, address ?: Config.Address.DEFAULT)
-            val response = FunctionReturnDecoder.decode(
-                responseValue, function.outputParameters)
-            if (response.size == 1) {
-                emitter.onSuccess(WalletUtil.isValidAddress((response[0] as Address).value))
-            } else {
+            try{
+                val responseValue =
+                    callSmartContractFunction(function, tokenAddress, address ?: Config.Address.DEFAULT)
+                val response = FunctionReturnDecoder.decode(
+                    responseValue, function.outputParameters)
+                if (response.size == 1) {
+                    emitter.onSuccess(WalletUtil.isValidAddress((response[0] as Address).value))
+                } else {
+                    emitter.onSuccess(false)
+                }
+            }catch(t: Throwable){
                 emitter.onSuccess(false)
             }
         }

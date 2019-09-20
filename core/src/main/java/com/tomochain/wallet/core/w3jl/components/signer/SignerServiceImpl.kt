@@ -4,6 +4,7 @@ import android.util.Log
 import com.tomochain.wallet.core.common.LogTag.TAG_W3JL
 import com.tomochain.wallet.core.common.exception.InvalidPrivateKeyException
 import com.tomochain.wallet.core.w3jl.entity.SignResult
+import com.tomochain.wallet.core.w3jl.entity.SignStatus
 import com.tomochain.wallet.core.w3jl.utils.WalletUtil
 import com.tomochain.wallet.core.wallet.WalletSecretDataService
 import io.reactivex.Single

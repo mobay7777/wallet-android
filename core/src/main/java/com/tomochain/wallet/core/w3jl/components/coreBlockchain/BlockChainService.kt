@@ -3,7 +3,7 @@ package com.tomochain.wallet.core.w3jl.components.coreBlockchain
 import com.tomochain.wallet.core.common.BaseService
 import com.tomochain.wallet.core.common.Config
 import com.tomochain.wallet.core.w3jl.entity.TransactionResult
-import com.tomochain.wallet.core.w3jl.listeners.TransactionListener
+
 import io.reactivex.Flowable
 import io.reactivex.Observable
 import io.reactivex.Single

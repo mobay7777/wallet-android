@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import com.tomochain.wallet.core.common.BaseService
 import com.tomochain.wallet.core.common.Config
 import com.tomochain.wallet.core.w3jl.entity.TransactionResult
-import com.tomochain.wallet.core.w3jl.listeners.TransactionListener
+
 import io.reactivex.Flowable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -24,14 +24,14 @@ interface TokenManagerService : BaseService{
     fun getTokenFormattedBalance() : Single<BigDecimal>?
     fun getTokenInfo() : Single<TokenInfo?>?
     fun getTokenTransferFee(
-            recipient: String = "",
-            amount: BigInteger = BigInteger.ZERO,
+            recipient: String = Config.Address.DEFAULT,
+            amount: BigInteger = BigInteger.TEN,
             gasPrice: BigInteger = BigInteger(Config.Transaction.DEFAULT_GAS_PRICE)
     ) : Single<Pair<BigInteger, TokenManagerImpl.UnitType>>?
 
     fun getFormattedTokenTransferFee(
-            recipient: String = "",
-            amount: BigInteger = BigInteger.ZERO,
+            recipient: String = Config.Address.DEFAULT,
+            amount: BigInteger = BigInteger.ONE,
             gasPrice: BigInteger = BigInteger(Config.Transaction.DEFAULT_GAS_PRICE)
     ) : Single<Pair<BigDecimal, TokenManagerImpl.UnitType>>?
 

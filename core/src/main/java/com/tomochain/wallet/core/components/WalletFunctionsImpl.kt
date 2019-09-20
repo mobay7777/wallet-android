@@ -4,7 +4,7 @@ import com.tomochain.wallet.core.w3jl.components.coreBlockchain.BlockChainServic
 import com.tomochain.wallet.core.w3jl.entity.SignResult
 import com.tomochain.wallet.core.w3jl.components.signer.SignerService
 import com.tomochain.wallet.core.w3jl.entity.TransactionResult
-import com.tomochain.wallet.core.w3jl.listeners.TransactionListener
+
 import io.reactivex.Observable
 import io.reactivex.Single
 import java.math.BigInteger

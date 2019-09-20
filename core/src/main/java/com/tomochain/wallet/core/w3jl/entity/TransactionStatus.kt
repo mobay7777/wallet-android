@@ -7,5 +7,5 @@ package com.tomochain.wallet.core.w3jl.entity
  * Happy coding ^_^
  */
 enum class TransactionStatus {
-    PENDING, SUCCESS, FAILED
+    CREATING, PENDING, SUCCESS, FAILED
 }

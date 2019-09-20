@@ -14,7 +14,7 @@ import com.tomochain.wallet.core.habak.cryptography.Habak
 import com.tomochain.wallet.core.room.walletSecret.WalletSecretDAO
 import com.tomochain.wallet.core.w3jl.entity.TransactionResult
 import com.tomochain.wallet.core.w3jl.entity.TransactionStatus
-import com.tomochain.wallet.core.w3jl.listeners.TransactionListener
+
 import com.tomochain.wallet.core.w3jl.utils.WalletUtil
 import com.tomochain.wallet.core.wallet.WalletSecretDataService
 import io.reactivex.*
@@ -116,6 +116,7 @@ class BlockChainServiceImpl(var address: String?,
         gasLimit: BigInteger?
     ): Observable<TransactionResult> {
         return Observable.create {emitter ->
+            emitter.onNext(TransactionResult(null, TransactionStatus.CREATING))
             if (!WalletUtil.isValidAddress(address)){
                 emitter.onError(InvalidAddressException())
                 return@create
@@ -190,6 +191,7 @@ class BlockChainServiceImpl(var address: String?,
     @SuppressLint("CheckResult")
     override fun sendSignedTransaction(signedTransaction: String?) : Observable<TransactionResult>{
         return Observable.create { emitter ->
+            emitter.onNext(TransactionResult(null, TransactionStatus.CREATING))
             val transaction =web3j?.ethSendRawTransaction(signedTransaction)?.send()
             if (transaction != null && transaction.transactionHash != null){
                 emitter.onNext(TransactionResult(transaction.transactionHash, TransactionStatus.PENDING))

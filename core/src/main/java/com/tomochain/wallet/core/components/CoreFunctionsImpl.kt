@@ -35,7 +35,7 @@ class CoreFunctionsImpl(private val dao: DatabaseWalletSecret?,
                     emitter.onError(InvalidMnemonicException())
                     return@create
                 }
-                val entityWalletKey = walletService.importWalletFromMnemonics(mnemonics!!, hdPath)?.blockingGet()
+                val entityWalletKey = walletService.importWalletFromMnemonics(mnemonics!!, hdPath).blockingGet()
 
                 if (entityWalletKey == null) {
                     emitter.onError(WalletNotFoundException())

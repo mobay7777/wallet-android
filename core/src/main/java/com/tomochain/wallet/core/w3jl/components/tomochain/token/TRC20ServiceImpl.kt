@@ -15,7 +15,8 @@ import com.tomochain.wallet.core.w3jl.components.coreBlockchain.BlockChainServic
 import com.tomochain.wallet.core.w3jl.config.chain.Chain
 import com.tomochain.wallet.core.w3jl.entity.TransactionResult
 import com.tomochain.wallet.core.w3jl.entity.TransactionStatus
-import com.tomochain.wallet.core.w3jl.listeners.TransactionListener
+
+import com.tomochain.wallet.core.w3jl.utils.ConvertUtil
 import com.tomochain.wallet.core.w3jl.utils.WalletUtil
 import com.tomochain.wallet.core.wallet.WalletSecretDataService
 import io.reactivex.Observable
@@ -58,6 +59,7 @@ class TRC20ServiceImpl( override var address: String?,
     ): Observable<TransactionResult> {
         return Observable.create {emitter ->
             try {
+                emitter.onNext(TransactionResult(null, TransactionStatus.CREATING))
                 if (!WalletUtil.isValidAddress(address) || !WalletUtil.isValidAddress(tokenAddress)){
                     emitter.onError(InvalidAddressException())
                     return@create
@@ -171,7 +173,7 @@ class TRC20ServiceImpl( override var address: String?,
                     "transfer",
                     listOf(
                         Address(recipient),
-                        Uint256(amount)
+                        Uint256(ConvertUtil.toWei("1", ConvertUtil.Unit.ETHER).toBigInteger())
                     ),
                     listOf(object : TypeReference<Bool>() {
 

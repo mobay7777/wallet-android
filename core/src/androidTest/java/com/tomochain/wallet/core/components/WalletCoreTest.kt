@@ -4,28 +4,18 @@ import android.provider.Settings
 
 import android.util.Log
 import androidx.test.InstrumentationRegistry
-import androidx.test.internal.util.LogUtil
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.runner.AndroidJUnit4
 
-import com.tomochain.wallet.core.common.exception.InvalidMnemonicException
-import com.tomochain.wallet.core.common.exception.InvalidPrivateKeyException
-import com.tomochain.wallet.core.common.exception.WalletAlreadyExistedException
-import com.tomochain.wallet.core.habak.EncryptedModel
 import com.tomochain.wallet.core.habak.cryptography.Habak
-import com.tomochain.wallet.core.w3jl.components.tomochain.token.TokenInfo
 import com.tomochain.wallet.core.w3jl.config.chain.Chain
 import com.tomochain.wallet.core.w3jl.config.chain.CommonChain
-import com.tomochain.wallet.core.w3jl.utils.ConvertUtil
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.lang.ref.WeakReference
-import org.junit.Assert.*
 import org.junit.Rule
-import org.web3j.crypto.Wallet
-import java.math.BigDecimal
 import java.math.BigInteger
 
 /**
@@ -45,7 +35,12 @@ internal class WalletCoreTest {
     @Before
     fun setUp() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        WalletCore.setup(WeakReference(context), object : CoreConfig(){
+        WalletCore.setup(WeakReference(context), object : CoreConfig(
+            chain,
+            habakAlias,
+            roomHelperSalt,
+            cryptographyManager
+        ) {
             override fun chain(): Chain {
                 return CommonChain.TOMO_CHAIN_TEST_NET
             }

@@ -7,6 +7,7 @@ import com.tomochain.wallet.core.common.di.DaggerCoreComponent
 import com.tomochain.wallet.core.w3jl.components.coreBlockchain.BlockChainService
 import com.tomochain.wallet.core.w3jl.components.signer.SignerService
 import com.tomochain.wallet.core.w3jl.components.tomochain.token.*
+import com.tomochain.wallet.core.w3jl.config.chain.CommonChain
 import com.tomochain.wallet.core.wallet.WalletSecretDataService
 import com.tomochain.wallet.core.wallet.WalletService
 import java.lang.ref.WeakReference
@@ -57,6 +58,10 @@ class WalletCore {
             instance?.config = config
             instance?.getCoreComponent()?.inject(instance)
         }
+
+
+
+
 
         private fun getInstance(address: String) : WalletCore?{
             val fAddress = address.toLowerCase()

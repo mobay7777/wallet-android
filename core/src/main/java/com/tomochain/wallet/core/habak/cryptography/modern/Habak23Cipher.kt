@@ -83,11 +83,6 @@ class Habak23Cipher(private val alias : String) : Habak {
             val encrypted = cipher.doFinal(plainText.toByteArray(Charsets.UTF_8))
             val now = Calendar.getInstance().timeInMillis
             val e = EncryptedModel(encrypted, iv, now)
-            Log.d(LogTag.TAG_HABAK,"encrypt source: $plainText")
-            Log.d(LogTag.TAG_HABAK,"encrypt result: $e")
-            Log.d(LogTag.TAG_HABAK,"encrypt result: ${e.toByteArrayString()}")
-            Log.d(LogTag.TAG_HABAK,"encrypt result: ${e.writeToString()}")
-
             return  e.writeToString()
         } catch (e: Exception) {
             Log.e(LogTag.TAG_HABAK,"encrypt: ", e)
@@ -122,23 +117,9 @@ class Habak23Cipher(private val alias : String) : Habak {
             srcBuffer.clear()
             sb
         } catch (e: Exception) {
-            Log.e("HABAK","decrypt: ", e)
+            Log.e(LogTag.TAG_HABAK,"decrypt: ", e)
             StringBuilder()
         }
     }
-
-
-    /*override fun decrypt(data: EncryptedModel): String {
-        return try {
-            val cipher = Cipher.getInstance(Constant.AES_MODE_FROM_M)
-            val spec = GCMParameterSpec(128, data.iv)
-            cipher.init(Cipher.DECRYPT_MODE, getSecretKey(), spec)
-            val r = String(cipher.doFinal(data.data), Charsets.UTF_8)
-            return r
-        } catch (e: Exception) {
-            Log.e("HABAK","decrypt: ", e)
-            ""
-        }
-    }*/
 
 }

@@ -34,7 +34,7 @@ class CoreModule(var context: WeakReference<Context>,
     @Singleton
     @Provides
     fun getHaBak() : Habak {
-        return config.cryptographyManager() ?: HabakFactory(context.get()).withAlias(config.habakAlias()).build()
+        return config.cryptographyManager ?: HabakFactory(context.get()).withAlias(config.cryptoAlias).build()
     }
 
     @Singleton
@@ -46,7 +46,7 @@ class CoreModule(var context: WeakReference<Context>,
     @Singleton
     @Provides
     fun getDatabaseWallet() : DatabaseWalletSecret {
-        return DatabaseWalletSecret.getInstance(context.get()!!, config.roomHelperSalt())!!
+        return DatabaseWalletSecret.getInstance(context.get()!!, config.roomAlias)!!
     }
 
 
@@ -59,7 +59,7 @@ class CoreModule(var context: WeakReference<Context>,
     @Singleton
     @Provides
     fun getWeb3JService() : Web3j {
-        return Web3j.build(HttpService(config.chain().getEndpoint()))
+        return Web3j.build(HttpService(config.chain?.getEndpoint()))
     }
 
     @Provides
@@ -79,7 +79,7 @@ class CoreModule(var context: WeakReference<Context>,
 
     @Provides
     fun getTokenService() : TokenService{
-        return TokenServiceImpl(null, getWeb3JService(), config.chain())
+        return TokenServiceImpl(null, getWeb3JService(), config.chain)
     }
 
 
@@ -88,7 +88,7 @@ class CoreModule(var context: WeakReference<Context>,
     fun getTRC20Service() : TRC20Service {
         return TRC20ServiceImpl(null,
                 getWeb3JService(),
-                config.chain(),
+                config.chain,
                 getWalletSecretDataService(),
             getCoreBlockChainService())
     }
@@ -98,7 +98,7 @@ class CoreModule(var context: WeakReference<Context>,
     fun getTRC21Service() : TRC21Service {
         return TRC21ServiceImpl(null,
             getWeb3JService(),
-            config.chain(),
+            config.chain,
             getWalletSecretDataService(),
             getCoreBlockChainService())
     }
@@ -107,7 +107,7 @@ class CoreModule(var context: WeakReference<Context>,
     @Provides
     fun getTokenManager() : TokenManagerService {
         return TokenManagerImpl(
-            TokenServiceImpl(null, getWeb3JService(), config.chain()),
+            TokenServiceImpl(null, getWeb3JService(), config.chain),
             getTRC20Service(), getTRC21Service()
         )
     }

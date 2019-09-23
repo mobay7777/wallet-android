@@ -52,25 +52,19 @@ class BlockChainServiceImpl(var address: String?,
                     emitter.onError(InvalidAddressException())
                     return@create
                 }
-                coreFunctions?.getWalletByAddress(address!!)
-                    ?.subscribe({wallet ->
-                        web3j?.ethGetBalance(wallet?.address, DefaultBlockParameterName.LATEST)
-                            ?.flowable()
-                            ?.doOnError {
-                                emitter.onError(it)
-                            }
-                            ?.subscribe (
-                                {e ->
-                                    emitter.onSuccess(e.balance)
-                                },
-                                {t ->
-                                    emitter.tryOnError(t)
-                                }
-                            )
-                    },{
-                        emitter.onError(WalletNotFoundException())
-                    })
-
+                web3j?.ethGetBalance(address, DefaultBlockParameterName.LATEST)
+                    ?.flowable()
+                    ?.doOnError {
+                        emitter.onError(it)
+                    }
+                    ?.subscribe (
+                        {e ->
+                            emitter.onSuccess(e.balance)
+                        },
+                        {t ->
+                            emitter.tryOnError(t)
+                        }
+                    )
             }catch (e : Exception){
                 //emitter.tryOnError(e)
                 Log.e(LogTag.TAG_W3JL,"CoreBlockChainServiceImpl > getAccountBalance: ${e.localizedMessage}")

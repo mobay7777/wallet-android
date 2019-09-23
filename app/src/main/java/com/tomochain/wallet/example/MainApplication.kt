@@ -5,6 +5,7 @@ import android.util.Base64
 import androidx.multidex.MultiDex
 import androidx.multidex.MultiDexApplication
 import com.tomochain.wallet.core.components.CoreConfig
+import com.tomochain.wallet.core.components.DefaultConfig
 import com.tomochain.wallet.core.components.WalletCore
 import com.tomochain.wallet.core.habak.EncryptedModel
 import com.tomochain.wallet.core.habak.cryptography.Habak
@@ -23,23 +24,13 @@ class MainApplication : MultiDexApplication(){
     override fun onCreate() {
         super.onCreate()
         MultiDex.install(this)
-        WalletCore.setup(WeakReference(this), object : CoreConfig(){
-            override fun chain(): Chain {
-                return CommonChain.TOMO_CHAIN_TEST_NET
-            }
 
-            override fun habakAlias(): String {
-                return "thisIsAlias"
-            }
+        val config = object : CoreConfig(){}
 
-            override fun roomHelperSalt(): String {
-                return "thisIsSalt"
-            }
+        config.chain = CommonChain.TOMO_CHAIN
+        config.cryptoAlias = "habakAlias"
 
-            override fun cryptographyManager(): Habak? {
-                return null
-            }
-        })
+        WalletCore.setup(WeakReference(this), config)
     }
 
 

@@ -11,6 +11,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_token.*
+import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
 
@@ -67,13 +68,16 @@ class TokenActivity : AppCompatActivity() {
 
     fun transfer(view: View) {
         val s = tokenManager
-            ?.withTokenAddress("0x9afff1e2657e3b87b9ccc9cc9a3fc1ed2f177b8a")
-            ?.transferToken(
+            ?.withTokenAddress("0xcd6bbf36b55e77921ca988247d487e861fcc2a2d")
+            ?.transferFormattedToken(
                 "0x6e7312d1028b70771bb9cdd9837442230a9349ca",
-                BigInteger.ONE
+                BigDecimal("0.1")
             )
             ?.subscribeOn(Schedulers.io())
             ?.observeOn(AndroidSchedulers.mainThread())
+            ?.doOnSubscribe {
+                Log.d("addLog","[${Calendar.getInstance().timeInMillis}]: CREATE 2")
+            }
             ?.subscribe({
                 addLog("transfer succcess: $it")
             },{

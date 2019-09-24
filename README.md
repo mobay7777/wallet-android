@@ -15,7 +15,7 @@
 
 Include the `core` library to your app:
 
-```
+```kotlin
 implementation project(':core')
 ```
 
@@ -23,12 +23,12 @@ implementation project(':core')
 
 In your `Application` class, init `WalletCore`
 
-```
+```kotlin
 WalletCore.setup(WeakReference(this))
 ```
 This method use [DefaultConfig](core/src/main/java/com/tomochain/wallet/core/components/DefaultConfig.kt) to setup the environment. You can modify the parameter by extend `CoreConfig` object:
 
-```
+```kotlin
 abstract class CoreConfig(
     open var chain: Chain? = CommonChain.TOMO_CHAIN,
     open var cryptoAlias: String? = "cryptoAlias",
@@ -47,7 +47,7 @@ abstract class CoreConfig(
 
 The [CoreFunctions](core/src/main/java/com/tomochain/wallet/core/components/CoreFunctions.kt) interface include functions to create, fetch and remove wallets. When you perform create or import, the WalletCore will save all data into database (Room), but when you fetch wallets, the sensitive data will be transparent. 
 
-```
+```kotlin
 WalletCore.getCoreFunctions()
 	?.createWallet()
 	?.subscribeOn(Schedulers.io())
@@ -89,7 +89,7 @@ WalletCore.getCoreFunctions()
 
 The [WalletFunctions](core/src/main/java/com/tomochain/wallet/core/components/WalletFunctions.kt) covers most functions that the single wallet need.
 
-```
+```kotlin
 WalletCore.getWalletFunctions("your-wallet-address")
 	?.subscribeOn(Schedulers.io())
 	?.observeOn(AndroidSchedulers.mainThread())
@@ -136,7 +136,7 @@ WalletCore.getWalletFunctions("your-wallet-address")
 
 WalletCore currently support `TRC20` and `TRC21` standard. To use the Token service, you can call the `TokenManager` without any doubt of knowing which type of current token.
 
-```
+```kotlin
 WalletCore.getTokenManager("your-wallet-address")
 	?.withTokenAddress("token-contract-address")
 	?.getTokenBalance()
@@ -184,7 +184,7 @@ WalletCore.getTokenManager("your-wallet-address")
 
 You can either use `TokenManager` or choose the specific Token-type-service (TRC20 or TRC21) service.
 
-```
+```kotlin
 WalletCore.getInstance("your-wallet-address")
 	?.tokenManager
 	?.getTRC21Services()

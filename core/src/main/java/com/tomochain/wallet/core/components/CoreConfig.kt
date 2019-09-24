@@ -11,7 +11,7 @@ import com.tomochain.wallet.core.w3jl.config.chain.CommonChain
  * Happy coding ^_^
  */
 abstract class CoreConfig(
-    open var chain: CommonChain? = CommonChain.TOMO_CHAIN,
+    open var chain: Chain? = CommonChain.TOMO_CHAIN,
     open var cryptoAlias: String? = "cryptoAlias",
     open var roomAlias: String? = "roomAlias",
     open var cryptographyManager: Habak? = null

@@ -28,12 +28,17 @@ abstract class DatabaseWalletSecret : RoomDatabase(){
             Log.d(LogTag.TAG_W3JL,"DatabaseWalletSecret > getInstance: [$helperSalt]")
             if (INSTANCE == null) {
                 synchronized(DatabaseWalletSecret::class) {
-                    INSTANCE = Room.databaseBuilder(context.applicationContext,
-                        DatabaseWalletSecret::class.java, Config.Database.NAME)
-                        .openHelperFactory(
-                            SafeHelperFactory
-                                .fromUser(SpannableStringBuilder(helperSalt)))
-                        .build()
+                    INSTANCE = if (helperSalt.isNullOrEmpty()){
+                        Room.databaseBuilder(context.applicationContext,
+                            DatabaseWalletSecret::class.java, Config.Database.NAME).build()
+                    }else{
+                        Room.databaseBuilder(context.applicationContext,
+                            DatabaseWalletSecret::class.java, Config.Database.NAME)
+                            .openHelperFactory(
+                                SafeHelperFactory
+                                    .fromUser(SpannableStringBuilder(helperSalt)))
+                            .build()
+                    }
                 }
             }
             return INSTANCE

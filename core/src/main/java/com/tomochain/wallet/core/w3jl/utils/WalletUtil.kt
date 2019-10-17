@@ -18,7 +18,6 @@ object WalletUtil {
         return try{
             MnemonicUtils.getWords()
         }catch(e: Exception){
-            Log.e(LogTag.TAG_W3JL, "getWordList",e)
             arrayListOf()
         }
     }
@@ -40,7 +39,6 @@ object WalletUtil {
         return try{
             mnemonics?.toLowerCase()?.split(" ")?.size == 12
         }catch(t: Throwable){
-            Log.e(LogTag.TAG_W3JL, "isValidMnemonics",t)
             false
         }
     }

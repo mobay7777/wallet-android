@@ -82,7 +82,6 @@ class SignerServiceImpl(var address: String?,
 
 
                     }catch(t: Throwable){
-                        Log.e(TAG_W3JL,"SignerServiceImpl > signRawMessage: ${t.localizedMessage}")
                         it.onSuccess(
                             SignResult(
                                 SignStatus.SIGN_FAIL,
@@ -153,7 +152,6 @@ class SignerServiceImpl(var address: String?,
 
 
                     }catch(t: Throwable){
-                        Log.e(TAG_W3JL,"SignerServiceImpl > signPersonalMessage: ${t.localizedMessage}")
                         it.onSuccess(
                             SignResult(
                                 SignStatus.SIGN_FAIL,
@@ -223,7 +221,6 @@ class SignerServiceImpl(var address: String?,
                         )
                         return@create
                     }catch(t: Throwable){
-                        Log.e(TAG_W3JL,"SignerServiceImpl > signTransaction: ${t.localizedMessage}")
                         it.onSuccess(
                             SignResult(
                                 SignStatus.SIGN_FAIL,

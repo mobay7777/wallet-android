@@ -39,7 +39,6 @@ class WalletSecretDataImpl(private val  habak: Habak?,
                 }
                 dao.walletDAO().getWallet(walletAddress!!).subscribe(
                     { wallet ->
-                        Log.d(LogTag.TAG_W3JL, "getPrivateKey: ${wallet?.encryptedPKey}")
                         if (wallet == null){
                             emitter.onSuccess(StringBuilder(""))
                         }else{
@@ -69,7 +68,6 @@ class WalletSecretDataImpl(private val  habak: Habak?,
                 }
                 dao.walletDAO().getWallet(walletAddress!!).subscribe(
                     { wallet ->
-                        Log.d(LogTag.TAG_W3JL, "getMnemonics: ${wallet?.encryptedSeed}")
                         if (wallet == null){
                             emitter.onSuccess(StringBuilder(""))
                         }else{

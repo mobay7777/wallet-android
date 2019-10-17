@@ -67,7 +67,6 @@ class BlockChainServiceImpl(var address: String?,
                     )
             }catch (e : Exception){
                 //emitter.tryOnError(e)
-                Log.e(LogTag.TAG_W3JL,"CoreBlockChainServiceImpl > getAccountBalance: ${e.localizedMessage}")
                 emitter.onError(e)
             }
         }
@@ -96,7 +95,7 @@ class BlockChainServiceImpl(var address: String?,
                     })
             }catch (e : Exception){
                 //emitter.tryOnError(e)
-                Log.e(LogTag.TAG_W3JL,"CoreBlockChainServiceImpl > getTransactionCount: ${e.localizedMessage}")
+
                 emitter.onSuccess(BigInteger.ZERO)
             }
         }
@@ -135,7 +134,6 @@ class BlockChainServiceImpl(var address: String?,
                         from, DefaultBlockParameterName.LATEST)?.sendAsync()?.get()
                     val nonce = ethGetTransactionCount?.transactionCount
 
-                    Log.e(LogTag.TAG_W3JL,"CoreBlockChainServiceImpl > transfer: $nonce")
                     val exactGasLimit = if (gasLimit == null){
                         if (payload.isNullOrEmpty()) BigInteger(Config.Transaction.DEFAULT_GAS_LIMIT) else
                             BigInteger(Config.Transaction.DEFAULT_GAS_LIMIT_WITH_PAYLOAD)
@@ -168,7 +166,6 @@ class BlockChainServiceImpl(var address: String?,
                             }
                             ?.retry()
                             ?.subscribe {
-                                Log.d(LogTag.TAG_W3JL,"tx status: $it")
                                 emitter.onNext(TransactionResult(transaction.transactionHash, if (it == "0x1") TransactionStatus.SUCCESS
                                 else TransactionStatus.FAILED))
                             }
@@ -201,7 +198,6 @@ class BlockChainServiceImpl(var address: String?,
                     }
                     ?.retry()
                     ?.subscribe {
-                        Log.d(LogTag.TAG_W3JL,"tx status: $it")
                         emitter.onNext(TransactionResult(transaction.transactionHash, if (it == "0x1") TransactionStatus.SUCCESS
                         else TransactionStatus.FAILED))
                     }

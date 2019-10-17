@@ -25,7 +25,7 @@ abstract class DatabaseWalletSecret : RoomDatabase(){
         private var INSTANCE: DatabaseWalletSecret? = null
 
         fun getInstance(context: Context, helperSalt: String? = ""): DatabaseWalletSecret? {
-            Log.d(LogTag.TAG_W3JL,"DatabaseWalletSecret > getInstance: [$helperSalt]")
+
             if (INSTANCE == null) {
                 synchronized(DatabaseWalletSecret::class) {
                     INSTANCE = if (helperSalt.isNullOrEmpty()){

@@ -228,3 +228,9 @@ WalletCore.getWalletSecretData("your-wallet-address")
 **Note** 
 
 - These methods always return a `StringBuilder` which contain **plain** sensitve information. You should call it only when you need, and clear the stringBuilder when you don't need it anymore.
+
+
+
+## LICENSE
+
+MIT

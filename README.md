@@ -12,10 +12,25 @@
 
 ## <a name=installation>Installation</a>
 
-Include the `core` library to your app:
+[![](https://jitpack.io/v/tomochain/tomowallet-core-android.svg)](https://jitpack.io/#tomochain/tomowallet-core-android)
+
+include Jitpack to your root project `build.gradle`
 
 ```kotlin
-implementation project(':core')
+allprojects{
+    repositories{
+        ...
+	maven { url 'https://jitpack.io' }
+    }
+}
+```
+
+in your app `build.gradle`
+```kotlin
+dependencies{
+    ...
+    implementation 'com.github.tomochain:tomowallet-core-android:0.0.1'
+}
 ```
 
 ## <a name=setup>Setup</a>

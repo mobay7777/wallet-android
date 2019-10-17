@@ -29,7 +29,7 @@ in your app `build.gradle`
 ```kotlin
 dependencies{
     ...
-    implementation 'com.github.tomochain:tomowallet-core-android:0.0.1'
+    implementation 'com.github.tomochain:tomowallet-core-android:1.0'
 }
 ```
 

@@ -10,27 +10,27 @@ enum class CommonChain : Chain {
 
     TOMO_CHAIN {
         override fun getEndpoint(): String {
-            return "https://rpc.tomochain.com"
+            return "https://rpc.rupaya.io"
         }
 
         override fun getChainName(): String {
-            return "TomoChain"
+            return "Rupaya"
         }
 
         override fun getChainId(): Int {
-            return 88
+            return 308
         }
 
         override fun getExplorerURL(): String {
-            return "https://scan.tomochain.com"
+            return "https://scan.rupaya.io"
         }
 
         override fun getCoinBaseUnit(): String {
-            return "TomoChain"
+            return "Rupaya"
         }
 
         override fun getCoinBaseSymbol(): String {
-            return "TOMO"
+            return "RUPX"
         }
 
         override fun getHDPath(): String {
@@ -40,11 +40,11 @@ enum class CommonChain : Chain {
 
     TOMO_CHAIN_TEST_NET {
         override fun getEndpoint(): String {
-            return "https://testnet.tomochain.com"
+            return "https://testnet.rupaya.io"
         }
 
         override fun getChainName(): String {
-            return "TomoChain TestNet"
+            return "Rupaya Testnet"
         }
 
         override fun getChainId(): Int {
@@ -52,15 +52,15 @@ enum class CommonChain : Chain {
         }
 
         override fun getExplorerURL(): String {
-            return "https://scan.testnet.tomochain.com"
+            return "https://scan.testnet.rupaya.io"
         }
 
         override fun getCoinBaseUnit(): String {
-            return "TomoChain"
+            return "Rupaya"
         }
 
         override fun getCoinBaseSymbol(): String {
-            return "TOMO"
+            return "RUPX"
         }
 
         override fun getHDPath(): String {
@@ -70,11 +70,11 @@ enum class CommonChain : Chain {
 
     TOMO_CHAIN_DEV_NET {
         override fun getEndpoint(): String {
-            return "https://rpc.devnet.tomochain.com"
+            return "https://rpc.devnet.rupaya.io"
         }
 
         override fun getChainName(): String {
-            return "TomoChain DevNet"
+            return "Rupaya Devnet"
         }
 
         override fun getChainId(): Int {
@@ -82,15 +82,15 @@ enum class CommonChain : Chain {
         }
 
         override fun getExplorerURL(): String {
-            return "https://scan.devnet.tomochain.com"
+            return "https://scan.devnet.rupaya.io"
         }
 
         override fun getCoinBaseUnit(): String {
-            return "TomoChain"
+            return "Rupaya"
         }
 
         override fun getCoinBaseSymbol(): String {
-            return "TOMO"
+            return "RUPX"
         }
 
         override fun getHDPath(): String {
